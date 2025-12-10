@@ -1,0 +1,17 @@
+{
+  "name": "PRO Trend Verification Map V2",
+  "short_name": "PRO Trend Map",
+  "description": "Offline PRO Trend Verification Checklist for Futures Trading",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "pro_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
