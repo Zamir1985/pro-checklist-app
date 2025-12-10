@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <title>PRO Trend Verification Map V2 — Offline Checklist</title>
+
+  <!-- Mobile viewport optimizations -->
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1,
+                 maximum-scale=5, user-scalable=yes,
+                 viewport-fit=cover" />
+
+  <!-- App Icon -->
+  <link rel="apple-touch-icon" sizes="180x180" href="pro_icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="pro_icon.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="pro_icon.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+
+  <!-- iOS Safari Fullscreen Mode -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --card-soft: #111827;
+      --accent: #fbbf24;
+      --accent-soft: #6b7280;
+      --danger: #f97373;
+      --success: #22c55e;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      touch-action: pan-x pan-y;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827, #020617);
+      color: var(--text);
+      padding: 8px;
+      overscroll-behavior: none;
+    }
+
+    textarea {
+      -webkit-user-select: text;
+      user-select: text;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+    }
+
+    .app {
+      max-width: 900px;
+      margin: 0 auto 32px auto;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      border: 1px solid #374151;
+      color: var(--muted);
+    }
+
+    .pill.critical {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: transparent;
+      color: var(--text);
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, #fbbf24, #f97316);
+      color: #020617;
+      font-weight: 600;
+    }
+
+    .btn.small {
+      padding: 3px 8px;
+      font-size: 0.68rem;
+    }
+
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.75rem;
+    }
+
+    .score-bar {
+      margin-top: 2px;
+      color: var(--muted);
+    }
+
+    .score-value {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .hf-flag {
+      margin-left: 6px;
+      font-size: 0.72rem;
+    }
+
+    .hf-ok { color: var(--success); }
+    .hf-bad { color: var(--danger); }
+
+    .sections {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .section {
+      background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.8));
+      border-radius: 12px;
+      padding: 6px 8px 7px;
+      border: 1px solid #111827;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      font-size: 0.62rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .badge.critical {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .section-score {
+      font-size: 0.7rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .collapse-icon {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+
+    .section.collapsed .items {
+      display: none;
+    }
+
+    .section.collapsed .collapse-icon {
+      transform: rotate(-90deg);
+      opacity: 0.7;
+    }
+
+    .item {
+      background: var(--card);
+      border-radius: 9px;
+      padding: 5px 6px;
+      border: 1px solid #020617;
+    }
+
+    .item-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1px;
+    }
+
+    .item-desc {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.25;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 3px;
+      flex-wrap: nowrap;
+    }
+
+    .item-btn {
+      flex: 1;
+      font-size: 0.64rem;
+      padding: 2px 3px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .item-btn.active-support {
+      border-color: var(--success);
+      background: rgba(34,197,94,0.16);
+      color: #bbf7d0;
+    }
+
+    .item-btn.active-neutral {
+      border-color: var(--accent-soft);
+      background: rgba(107,114,128,0.22);
+      color: #e5e7eb;
+    }
+
+    .item-btn.active-against {
+      border-color: var(--danger);
+      background: rgba(249,115,115,0.18);
+      color: #fee2e2;
+    }
+
+    .item-footer {
+      margin-top: 2px;
+      font-size: 0.64rem;
+      color: #6b7280;
+    }
+
+    .item-hardfail-flag {
+      font-size: 0.6rem;
+      color: var(--danger);
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .final-card {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #020617, #020617);
+      border: 1px solid #4b5563;
+    }
+
+    .final-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .final-score-line {
+      font-size: 0.75rem;
+      margin-bottom: 3px;
+    }
+
+    .final-verdict {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .final-note {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .export-box {
+      margin-top: 7px;
+      background: #020617;
+      border-radius: 9px;
+      border: 1px solid #111827;
+      padding: 5px;
+    }
+
+    .export-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .export-box textarea {
+      width: 100%;
+      min-height: 100px;
+      border-radius: 7px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: var(--muted);
+      font-size: 0.68rem;
+      padding: 6px;
+      resize: vertical;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      max-height: 200px;
+    }
+
+    @media (max-width: 600px) {
+      .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app">
+
+  <h1>PRO Trend Verification Map — FULL MODE V2</h1>
+  <div class="subtitle">
+    START siqnalından sonra 10–20 saniyəyə bütün PRO xəritəni yoxlamaq üçün offline checklist.
+    V2: Hard-Fail sistemi, kompakt UI, collapse bölmələr, Telegram export.
+  </div>
+
+  <div class="pill-row">
+    <div class="pill critical">0. Qərar filteri → yalnız güclü impulslar</div>
+    <div class="pill">Bölmə 1: Futures Real Impulse (8)</div>
+    <div class="pill">Bölmə 2: Spot Confirmation (4)</div>
+    <div class="pill">Bölmə 3: Extra PRO (6)</div>
+    <div class="pill">Bölmə 4: Market Structure (2)</div>
+    <div class="pill">Bölmə 5: BTC Regime (1)</div>
+  </div>
+
+  <div class="top-bar">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn primary" onclick="resetAll()">Reset All</button>
+      <button class="btn small" onclick="copyExport()">Copy Export</button>
+    </div>
+    <div class="score-bar">
+      Overall Score: <span id="overallScore" class="score-value">0</span> / 21
+      <span id="hfStatus" class="hf-flag hf-ok">Hard-Fail: Yox</span>
+    </div>
+  </div>
+
+  <div class="sections">
+
+    <!-- SECTION 0 — DECISION FILTER -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          🔵 0. Qərar Filteri
+          <span class="badge critical">İlk 5–10 saniyə</span>
+        </div>
+        <div class="section-score"><span class="collapse-icon">▼</span></div>
+      </div>
+      <div class="items">
+        <div style="font-size:0.72rem;color:var(--muted);line-height:1.35;">
+          START siqnalından sonra özündən soruş:
+          <br>• Bu siqnal range içindədir, yoxsa açıq impulsdadır?
+          <br>• Saniyələr içində > THRESHOLD hərəkət + güclü volume var?
+          <br>Əgər cavab “bilmirəm”dirsə → hələ qərar vermə, aşağıdakı PRO xəritəni doldur.
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1 — FUTURES IMPULSE -->
+    <div class="section" data-section="1">
+      <div class="section-header">
+        <div class="section-title">🟦 Bölmə 1 — Futures REAL Impulse Check
+          <span class="badge critical">Ən vacib 8 punkt</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-1">0</span> / 8
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+
+      <div class="items">
+
+        <!-- ITEM 1 -->
+        <div class="item" data-id="1">
+          <div class="item-title">1) Taker Buy/Sell Flow (Δ Taker)</div>
+          <div class="item-desc">
+            Bullish: Buy üstün, yaşıl spike, buy > 55–60%.<br>
+            Kritik: Price ↑ amma buy zəif → fake pump riski.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 2 -->
+        <div class="item" data-id="2">
+          <div class="item-title">2) Basis (Futures vs Spot Premium)</div>
+          <div class="item-desc">
+            Bullish: Basis yüngül ↑.<br>
+            Kritik: Basis stabil → manip risk.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 3 -->
+        <div class="item" data-id="3">
+          <div class="item-title">3) OI / Market Cap Ratio</div>
+          <div class="item-desc">
+            Bullish: Ratio stabil / ↑.<br>
+            Kritik: Ratio ↓ → trend yorğun.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 4 (HARD FAIL) -->
+        <div class="item" data-id="4" data-hardfail="true">
+          <div class="item-title">
+            4) OI Dynamics — 4 Davranış
+            <span class="item-hardfail-flag">HARD-FAIL</span>
+          </div>
+          <div class="item-desc">
+            ↑OI + ↑Price → continuation <br>
+            ↑OI + ↓Price → trap (SHORT) <br>
+            ↓OI + ↑Price → squeeze (LONG) <br>
+            ↓OI + ↓Price → trend bitir
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports Setup</button>
+            <button class="item-btn" onclick="setScore(this,0)">Mixed</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Trap</button>
+          </div>
+        </div>
+
+        <!-- ITEM 5 -->
+        <div class="item" data-id="5">
+          <div class="item-title">5) Notional OI</div>
+          <div class="item-desc">
+            Bullish: Notional + Price birlikdə ↑.<br>
+            Kritik: Notional stabil → retail-only pump.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 6 -->
+        <div class="item" data-id="6">
+          <div class="item-title">6) Top Trader Account Ratio</div>
+          <div class="item-desc">
+            Bullish: Retail short-heavy.<br>
+            Kritik: Retail hamısı long → FOMO.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Good</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+          </div>
+        </div>
+
+        <!-- ITEM 7 -->
+        <div class="item" data-id="7">
+          <div class="item-title">7) Top Trader Position Ratio</div>
+          <div class="item-desc">
+            Bullish: Pros sənin tərəfdə.<br>
+            Ziddiyyət varsa — ehtiyat.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Pros with me</button>
+            <button class="item-btn" onclick="setScore(this,0)">Mixed</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Opposite</button>
+          </div>
+        </div>
+
+        <!-- ITEM 8 -->
+        <div class="item" data-id="8">
+          <div class="item-title">8) Global Long/Short Ratio</div>
+          <div class="item-desc">
+            Bullish: Global > 1.<br>
+            Bearish: Global < 1.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Good</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 2 — SPOT CONFIRMATION -->
+    <div class="section" data-section="2">
+
+      <div class="section-header">
+        <div class="section-title">
+          🟩 Bölmə 2 — Spot Confirmation (4 blok)
+          <span class="badge">Trend davamı</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-2">0</span> / 4
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+
+      <div class="items">
+
+        <!-- ITEM 9 -->
+        <div class="item" data-id="9">
+          <div class="item-title">BLOCK 1 — Spot Money Flow</div>
+          <div class="item-desc">
+            Bullish: Net inflow, real buy walls.<br>
+            Bearish: Net outflow, sell walls.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 10 -->
+        <div class="item" data-id="10">
+          <div class="item-title">BLOCK 2 — Spot Volume</div>
+          <div class="item-desc">
+            Bullish: Volume ↑ davamlı.<br>
+            Bearish: Volume sönür.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Good</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+          </div>
+        </div>
+
+        <!-- ITEM 11 -->
+        <div class="item" data-id="11">
+          <div class="item-title">BLOCK 3 — Spot Orderbook</div>
+          <div class="item-desc">
+            Bullish: BID walls, absorption buy.<br>
+            Bearish: ASK walls, spoofing.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 12 -->
+        <div class="item" data-id="12">
+          <div class="item-title">BLOCK 4 — Spot Price Action</div>
+          <div class="item-desc">
+            HH/HL → bullish.<br>
+            LH/LF → bearish.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 3 — EXTRA PRO -->
+    <div class="section" data-section="3">
+
+      <div class="section-header">
+        <div class="section-title">
+          🟪 Bölmə 3 — Extra PRO Indicators
+          <span class="badge">Detallı analiz</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-3">0</span> / 6
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+
+      <div class="items">
+
+        <!-- ITEM 13 -->
+        <div class="item" data-id="13">
+          <div class="item-title">1) CVD (Cumulative Volume Delta)</div>
+          <div class="item-desc">
+            Bullish: CVD ↑ + Price ↑.<br>
+            Divergence → risk.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 14 -->
+        <div class="item" data-id="14">
+          <div class="item-title">2) Liquidation Heatmap</div>
+          <div class="item-desc">
+            Yuxarı cluster → continuation.<br>
+            Aşağı cluster → drop riski.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 15 -->
+        <div class="item" data-id="15">
+          <div class="item-title">3) VWAP</div>
+          <div class="item-desc">
+            Bullish: Price > VWAP.<br>
+            Bearish: Price < VWAP.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 16 -->
+        <div class="item" data-id="16">
+          <div class="item-title">4) Tape Reading</div>
+          <div class="item-desc">
+            Bullish: ardıcıl yaşıl prints.<br>
+            Bearish: qırmızı high-size prints.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Good</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+          </div>
+        </div>
+
+        <!-- ITEM 17 -->
+        <div class="item" data-id="17">
+          <div class="item-title">5) Funding Curve</div>
+          <div class="item-desc">
+            Normal funding → ok.<br>
+            Sharp funding ↑ → trap riski.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 18 -->
+        <div class="item" data-id="18">
+          <div class="item-title">6) Implied Volatility (IV)</div>
+          <div class="item-desc">
+            Bullish: IV ↑ + Price ↑.<br>
+            Bearish: IV ↓ + Price ↑.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Good</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 4 — MARKET STRUCTURE -->
+    <div class="section" data-section="4">
+
+      <div class="section-header">
+        <div class="section-title">
+          🟥 Bölmə 4 — Market Structure
+          <span class="badge">4H + Local</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-4">0</span> / 2
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+
+      <div class="items">
+
+        <!-- ITEM 19 -->
+        <div class="item" data-id="19">
+          <div class="item-title">1) 4H Macro Trend</div>
+          <div class="item-desc">
+            Bullish: Price EMA 50/200 üstündə.<br>
+            Bearish: altındadır.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+        <!-- ITEM 20 -->
+        <div class="item" data-id="20">
+          <div class="item-title">2) Local Structure</div>
+          <div class="item-desc">
+            BOS up → bullish.<br>
+            BOS down → bearish.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Good</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 5 — BTC REGIME -->
+    <div class="section" data-section="5">
+
+      <div class="section-header">
+        <div class="section-title">
+          🟧 Bölmə 5 — BTC Regime
+          <span class="badge">Altcoin Must</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-5">0</span> / 1
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+
+      <div class="items">
+
+        <!-- ITEM 21 (HARD FAIL) -->
+        <div class="item" data-id="21" data-hardfail="true">
+          <div class="item-title">
+            BTC Mood (OI, VWAP, Liquidity)
+            <span class="item-hardfail-flag">HARD-FAIL</span>
+          </div>
+          <div class="item-desc">
+            Bullish: OI ↑ + Price ↑, VWAP üstü.<br>
+            Bearish: OI ↑ + Price ↓ → trap risk.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FINAL CARD -->
+    <div class="final-card">
+
+      <div class="final-title">🚀 Final Decision Map</div>
+
+      <div class="final-score-line">
+        Overall Score:
+        <span id="finalScoreText" class="score-value">0 / 21</span>
+      </div>
+
+      <div id="finalVerdict" class="final-verdict">Status: No data</div>
+
+      <div id="finalComment" class="final-note">
+        Checklist-i doldur, nəticə burada real-time yenilənəcək.
+      </div>
+
+      <div class="export-box">
+        <div class="export-label">Telegram üçün Export:</div>
+        <textarea id="exportText" readonly></textarea>
+      </div>
+
+    </div>
+
+    <!-- .sections bitişi -->
+  </div>
+  <!-- .app bitişi -->
+</div>
+
+<!-- iOS textarea scroll fix (alt sətirlər kəsilməsin) -->
+<style>
+  #exportText {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-height: 220px;
+  }
+</style>
+
+<script>
+  // SECTION HEADER COLLAPSE — düymələrə toxunmadan işləyir
+  document.querySelectorAll(".section-header").forEach((h) => {
+    h.addEventListener("click", (e) => {
+      if (e.target.closest("button")) return; // button klikini bloklama
+      const sec = h.closest(".section");
+      if (!sec) return;
+      sec.classList.toggle("collapsed");
+    });
+  });
+
+  // Default: yalnız Bölmə 1 açıq, qalanları collapsed
+  document.querySelectorAll(".section[data-section]").forEach((sec) => {
+    const id = parseInt(sec.dataset.section || "0", 10);
+    if (id > 1) sec.classList.add("collapsed");
+  });
+
+  // Hər item üçün score yaz
+  function setScore(btn, score) {
+    const item = btn.closest(".item");
+    if (!item) return;
+
+    item.dataset.score = score;
+
+    const all = item.querySelectorAll(".item-btn");
+    all.forEach((b) =>
+      b.classList.remove("active-support", "active-neutral", "active-against")
+    );
+
+    if (score === 1) btn.classList.add("active-support");
+    else if (score === 0) btn.classList.add("active-neutral");
+    else if (score === -1) btn.classList.add("active-against");
+
+    recompute();
+  }
+
+  // Bölmə maksimum xalı
+  function sectionMax(id) {
+    const map = { 1: 8, 2: 4, 3: 6, 4: 2, 5: 1 };
+    return map[id] || 0;
+  }
+
+  // Verdict mətni
+  function buildVerdict(total, hardFail) {
+    if (hardFail) {
+      return {
+        verdict: "❌ HARD-FAIL — NO TRADE",
+        comment:
+          "BTC və ya OI Dynamics ciddi əleyhdədir. Score yüksək olsa belə TREYD ETMƏ. Trap riskini qəbul etmə."
+      };
+    }
+
+    if (total >= 13) {
+      return {
+        verdict: "✅ HIGH CONVICTION — PRO Entry",
+        comment:
+          "Futures + Spot + Extra PRO + Struktur + BTC hamısı sənin tərəfindədir. Planlı risklə PRO ölçüdə entry mümkündür."
+      };
+    }
+
+    if (total >= 7) {
+      return {
+        verdict: "🟢 STRONG / OK Setup",
+        comment:
+          "Əsas bloklar alignment verir. Normal ölçüdə trade edilə bilər, zəif blokları risk hesablamasında nəzərə al."
+      };
+    }
+
+    if (total >= 3) {
+      return {
+        verdict: "🟡 MIXED — Small Size / Scout",
+        comment:
+          "Bəzi bloklar yaxşı, bəziləri əleyhinədir. Bu daha çox scout-size və praktik müşahidə treydi üçündür."
+      };
+    }
+
+    if (total >= 0) {
+      return {
+        verdict: "🟧 WEAK — NO-TRADE Zone",
+        comment:
+          "Alignment çox zəifdir. Daha təmiz impuls və daha güclü təsdiq üçün səbr etmək uzun müddətdə daha sərfəlidir."
+      };
+    }
+
+    return {
+      verdict: "🔴 CONTRARIAN ONLY",
+      comment:
+        "Ümumi skor mənfidir. Bu yalnız çox təcrübəli kontrarian scalp üçün məntiqlidir, normal treyd üçün uyğun deyil."
+    };
+  }
+
+  // Export mətni
+  function buildExport(secScores, total, verdict, hardFail) {
+    let text = "";
+    text += "📌 PRO Trend Verification — FULL MODE V2\n";
+    text += "----------------------------------------\n";
+    text += `🟦 Futures Impulse: ${secScores[1]} / 8\n`;
+    text += `🟩 Spot Confirmation: ${secScores[2]} / 4\n`;
+    text += `🟪 Extra PRO: ${secScores[3]} / 6\n`;
+    text += `🟥 Market Structure: ${secScores[4]} / 2\n`;
+    text += `🟧 BTC Regime: ${secScores[5]} / 1\n\n`;
+    text += `📊 Overall Score: ${total} / 21\n`;
+    text += `⚙️ Hard-Fail: ${hardFail ? "VAR (NO-TRADE)" : "Yox"}\n`;
+    text += `🧾 Verdict: ${verdict}\n`;
+
+    const ta = document.getElementById("exportText");
+    if (ta) ta.value = text;
+  }
+
+  // Əsas engine — real-time scoring
+  function recompute() {
+    let total = 0;
+    let hardFail = false;
+    const secScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+
+    document.querySelectorAll(".item").forEach((item) => {
+      const s = parseInt(item.dataset.score || "0", 10);
+      const secEl = item.closest(".section");
+      const sec = secEl ? parseInt(secEl.dataset.section || "0", 10) : 0;
+
+      if (sec > 0) secScores[sec] += s;
+      total += s;
+
+      if (s === -1 && item.dataset.hardfail === "true") {
+        hardFail = true;
+      }
+    });
+
+    // Bölmə skorları
+    for (let i = 1; i <= 5; i++) {
+      const el = document.getElementById("score-sec-" + i);
+      if (el) el.textContent = `${secScores[i]} / ${sectionMax(i)}`;
+    }
+
+    // Overall skor
+    const overallEl = document.getElementById("overallScore");
+    if (overallEl) overallEl.textContent = total;
+
+    const finalScoreText = document.getElementById("finalScoreText");
+    if (finalScoreText) finalScoreText.textContent = `${total} / 21`;
+
+    // Hard-Fail statusu
+    const hf = document.getElementById("hfStatus");
+    if (hf) {
+      if (hardFail) {
+        hf.textContent = "Hard-Fail: VAR";
+        hf.classList.remove("hf-ok");
+        hf.classList.add("hf-bad");
+      } else {
+        hf.textContent = "Hard-Fail: Yox";
+        hf.classList.remove("hf-bad");
+        hf.classList.add("hf-ok");
+      }
+    }
+
+    // Verdict
+    const result = buildVerdict(total, hardFail);
+    const verdictEl = document.getElementById("finalVerdict");
+    const commentEl = document.getElementById("finalComment");
+
+    if (verdictEl) verdictEl.textContent = result.verdict;
+    if (commentEl) commentEl.textContent = result.comment;
+
+    // Export panelini yenilə
+    buildExport(secScores, total, result.verdict, hardFail);
+  }
+
+  // Reset All
+  function resetAll() {
+    document.querySelectorAll(".item").forEach((item) => {
+      delete item.dataset.score;
+      item
+        .querySelectorAll(".item-btn")
+        .forEach((btn) =>
+          btn.classList.remove(
+            "active-support",
+            "active-neutral",
+            "active-against"
+          )
+        );
+    });
+
+    const ta = document.getElementById("exportText");
+    if (ta) ta.value = "";
+
+    recompute();
+  }
+
+  // Copy Export düyməsi
+  async function copyExport() {
+    const ta = document.getElementById("exportText");
+    if (!ta) return;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(ta.value);
+      } else {
+        ta.focus();
+        ta.select();
+        document.execCommand("copy");
+      }
+      alert("Export kopyalandı ✔");
+    } catch (err) {
+      alert("Copy alınmadı, mətni əl ilə seç.");
+    }
+  }
+
+  // iOS keyboard alt sətir fix
+  document.addEventListener("focusin", (e) => {
+    if (e.target.tagName === "TEXTAREA") {
+      setTimeout(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+      }, 200);
+    }
+  });
+
+  // Service Worker qeydiyyatı (PWA offline)
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("service-worker.js")
+        .catch((err) => console.log("SW registration failed:", err));
+    });
+  }
+
+  // İlk hesablama
+  recompute();
+</script>
+
+</body>
+</html>
