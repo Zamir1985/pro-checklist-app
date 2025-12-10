@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <title>PRO Trend Verification Map V2 — Offline Checklist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --card-soft: #111827;
+      --accent: #fbbf24;
+      --accent-soft: #6b7280;
+      --danger: #f97373;
+      --success: #22c55e;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #111827, #020617);
+      color: var(--text);
+      padding: 8px;
+    }
+    .app {
+      max-width: 900px;
+      margin: 0 auto 32px auto;
+    }
+    h1 {
+      font-size: 1.25rem;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 10px;
+      line-height: 1.35;
+    }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      border: 1px solid #374151;
+      color: var(--muted);
+    }
+    .pill.critical { border-color: var(--accent); color: var(--accent); }
+    .top-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.75rem;
+    }
+    .btn {
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: transparent;
+      color: var(--text);
+      padding: 4px 10px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+    .btn.primary {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, #fbbf24, #f97316);
+      color: #020617;
+      font-weight: 600;
+    }
+    .btn.small { padding: 3px 8px; font-size: 0.68rem; }
+    .score-bar {
+      margin-top: 2px;
+      color: var(--muted);
+    }
+    .score-value {
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .hf-flag {
+      margin-left: 6px;
+      font-size: 0.72rem;
+    }
+    .hf-ok { color: var(--success); }
+    .hf-bad { color: var(--danger); }
+
+    .sections {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .section {
+      background: linear-gradient(135deg, rgba(15,23,42,0.96), rgba(15,23,42,0.8));
+      border-radius: 12px;
+      padding: 6px 8px 7px;
+      border: 1px solid #111827;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge {
+      font-size: 0.62rem;
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .badge.critical { border-color: var(--accent); color: var(--accent); }
+    .section-score {
+      font-size: 0.7rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .collapse-icon {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .items {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .section.collapsed .items {
+      display: none;
+    }
+    .section.collapsed .collapse-icon {
+      transform: rotate(-90deg);
+      opacity: 0.7;
+    }
+
+    .item {
+      background: var(--card);
+      border-radius: 9px;
+      padding: 5px 6px;
+      border: 1px solid #020617;
+    }
+    .item-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1px;
+    }
+    .item-desc {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.25;
+    }
+    .item-actions {
+      display: flex;
+      gap: 3px;
+      flex-wrap: nowrap;
+    }
+    .item-btn {
+      flex: 1;
+      font-size: 0.64rem;
+      padding: 2px 3px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .item-btn.active-support {
+      border-color: var(--success);
+      background: rgba(34,197,94,0.16);
+      color: #bbf7d0;
+    }
+    .item-btn.active-neutral {
+      border-color: var(--accent-soft);
+      background: rgba(107,114,128,0.22);
+      color: #e5e7eb;
+    }
+    .item-btn.active-against {
+      border-color: var(--danger);
+      background: rgba(249,115,115,0.18);
+      color: #fee2e2;
+    }
+    .item-footer {
+      margin-top: 2px;
+      font-size: 0.64rem;
+      color: #6b7280;
+    }
+    .item-hardfail-flag {
+      font-size: 0.6rem;
+      color: var(--danger);
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    .final-card {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #020617, #020617);
+      border: 1px solid #4b5563;
+    }
+    .final-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+    .final-score-line {
+      font-size: 0.75rem;
+      margin-bottom: 3px;
+    }
+    .final-verdict {
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .final-note {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .export-box {
+      margin-top: 7px;
+      background: #020617;
+      border-radius: 9px;
+      border: 1px solid #111827;
+      padding: 5px;
+    }
+    .export-box textarea {
+      width: 100%;
+      min-height: 80px;
+      border-radius: 7px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: var(--muted);
+      font-size: 0.68rem;
+      padding: 4px;
+      resize: vertical;
+    }
+    .export-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    @media (max-width: 600px) {
+      .section-header { flex-direction: row; align-items: center; }
+      .top-bar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <h1>PRO Trend Verification Map — FULL MODE V2</h1>
+  <div class="subtitle">
+    START siqnalından sonra 10–20 saniyəyə bütün PRO xəritəni yoxlamaq üçün offline checklist.
+    V2: Hard-Fail sistemi, kompakt UI, collapse bölmələr, Telegram export.
+  </div>
+
+  <div class="pill-row">
+    <div class="pill critical">0. Qərar filteri → yalnız güclü impulslar</div>
+    <div class="pill">Bölmə 1: Futures Real Impulse (8)</div>
+    <div class="pill">Bölmə 2: Spot Confirmation (4)</div>
+    <div class="pill">Bölmə 3: Extra PRO (6)</div>
+    <div class="pill">Bölmə 4: Market Structure (2)</div>
+    <div class="pill">Bölmə 5: BTC Regime (1)</div>
+  </div>
+
+  <div class="top-bar">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn primary" onclick="resetAll()">Reset All</button>
+      <button class="btn small" onclick="exportSummary()">Copy Export</button>
+    </div>
+    <div class="score-bar">
+      Overall Score: <span id="overallScore" class="score-value">0</span> / 21
+      <span id="hfStatus" class="hf-flag hf-ok">Hard-Fail: Yox</span>
+    </div>
+  </div>
+
+  <div class="sections">
+
+    <!-- SECTION 0 — DECISION FILTER (text only, collapsible) -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">
+          🔵 0. Qərar Filteri
+          <span class="badge critical">İlk 5–10 saniyə</span>
+        </div>
+        <div class="section-score">
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+      <div class="items">
+        <div style="font-size:0.72rem;color:var(--muted);line-height:1.35;">
+          START siqnalından sonra özündən soruş:
+          <br>• Bu siqnal range zibili içindədir, yoxsa açıq impulsdadır?
+          <br>• Saniyələr içində &gt; THRESHOLD hərəkət + güclü volume var?
+          <br>Əgər cavabın “bilmirəm”dirsə → <b>hələ heç nə etmə</b>, aşağıdakı bölmələri doldur, sonra qərar ver.
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 1 — FUTURES IMPULSE -->
+    <div class="section" data-section="1">
+      <div class="section-header">
+        <div class="section-title">
+          🟦 Bölmə 1 — Futures REAL Impulse Check
+          <span class="badge critical">Ən vacib 8 punkt</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-1">0</span> / 8
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+      <div class="items">
+
+        <div class="item" data-id="1">
+          <div class="item-title">1) Taker Buy/Sell Flow (Δ Taker)</div>
+          <div class="item-desc">
+            Bullish: Taker Buy üstün, yaşıl spike, buy &gt; ~55–60%.<br>
+            Kritik: Price ↑ amma taker buy zəif və ya sell dominant → fake pump riski.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports Trade</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / unclear</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against Trade</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Time&Sales + Taker qrafikində real alıcıların girib-girmədiyini hiss et.</div>
+        </div>
+
+        <div class="item" data-id="2">
+          <div class="item-title">2) Basis (Futures vs Spot Premium)</div>
+          <div class="item-desc">
+            Bullish: Basis yüngülcə ↑ və 0-dan yuxarı, funding normal.<br>
+            Kritik: Price ↑ amma basis sabit / çox yüksək → fut→spot manipulyasiya və ya trend yorğunluğu.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports Trade</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against Trade</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Fut/spot fərqi “yanmırsa”, spot demand daha realdır.</div>
+        </div>
+
+        <div class="item" data-id="3">
+          <div class="item-title">3) OI / Market Cap Ratio</div>
+          <div class="item-desc">
+            Bullish: Ratio stabil və ya artan; flash spike sonra sakit → institution load.<br>
+            Kritik: Price ↑ amma OI/MC ↓ və ya ratio çox yüksək → trend bitmə / liquidation hunt riski.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports Trade</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against Trade</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Ratio qrafikində trendin “sağlam” görünməsini izlə.</div>
+        </div>
+
+        <div class="item" data-id="4" data-hardfail="true">
+          <div class="item-title">
+            4) OI Dynamics — 4 Davranış
+            <span class="item-hardfail-flag">HARD-FAIL potensialı</span>
+          </div>
+          <div class="item-desc">
+            ↑OI + ↑Price → real trend (davam);<br>
+            ↑OI + ↓Price → leverage trap (SHORT);<br>
+            ↓OI + ↑Price → short squeeze (LONG);<br>
+            ↓OI + ↓Price → trend bitir (çıx/etmə).
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports Trade Setup</button>
+            <button class="item-btn" onclick="setScore(this,0)">Mixed / unclear</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Contradicts Setup (Trap)</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Sənin planladığın LONG/SHORT yönü ilə bu cədvəli uyğunlaşdır.</div>
+        </div>
+
+        <div class="item" data-id="5">
+          <div class="item-title">5) Notional OI</div>
+          <div class="item-desc">
+            Bullish: Notional + Price sinxron, notional spike → institution load.<br>
+            Kritik: Price ↑ amma Notional stabil → zəif trend / retail-only impuls.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Supports Trade</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Against Trade</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Pullu OI (notional) price ilə əl-ələ gedirmi?</div>
+        </div>
+
+        <div class="item" data-id="6">
+          <div class="item-title">6) Top Trader Account Ratio (Retail davranışı)</div>
+          <div class="item-desc">
+            Bullish impulse üçün ideal: Retail short-heavy (Acct &lt; 0.90).<br>
+            Kritik: Acct &gt; 1.15 (hamı long) → FOMO, gec giriş təhlükəli.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Retail mənə qarşı (yaxşı)</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / normal</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Retail mənimlə eyni tərəfdə (risk)</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Retail sənin tərəfinə nə qədər yığışıb, nə qədər qarşıdadır?</div>
+        </div>
+
+        <div class="item" data-id="7">
+          <div class="item-title">7) Top Trader Position Ratio (Pro davranışı)</div>
+          <div class="item-desc">
+            Pro üçün qızıl: Pos L/S &gt; 1.05 (long yığır) və ya &lt; 0.95 (short yığır).<br>
+            Kritik: Account və Position arasında ziddiyyət varsa → ehtiyatlı ol.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Pros align with my side</button>
+            <button class="item-btn" onclick="setScore(this,0)">Mixed / divergence</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Pros opposite side</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Pro-lar səninlə eyni tərəfdədirsə, siqnalın dəyəri xeyli artır.</div>
+        </div>
+
+        <div class="item" data-id="8">
+          <div class="item-title">8) Global L/S Ratio (Market mood)</div>
+          <div class="item-desc">
+            Bullish: Global &gt; 1 → mood pozitiv.<br>
+            Bearish risk: Global &lt; 1 → ümumi sentiment zəifdir.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Global mood dəstəyir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / balanslı</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Global mood əleyhinə</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Altcoin siqnalını global mood-lan kəsiş.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 2 — SPOT CONFIRMATION -->
+    <div class="section" data-section="2">
+      <div class="section-header">
+        <div class="section-title">
+          🟩 Bölmə 2 — Spot Confirmation (4 blok)
+          <span class="badge">Trend davamı üçün təsdiq</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-2">0</span> / 4
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+      <div class="items">
+
+        <div class="item" data-id="9">
+          <div class="item-title">BLOCK 1 — Spot Money Flow</div>
+          <div class="item-desc">
+            Bullish: Net inflow, spot buy walls, alıcıların real görünməsi.<br>
+            Bearish: Net outflow, sell walls, likvidlikdən qaçış.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Spot money mənim tərəfimdədir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / zəif</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Money flow əleyhinə</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Spot tab-da net inflow/outflow və walls-a bax.</div>
+        </div>
+
+        <div class="item" data-id="10">
+          <div class="item-title">BLOCK 2 — Spot Volume</div>
+          <div class="item-desc">
+            Bullish: Volume ↑ və davamlı, impuls “nəfəs alır”.<br>
+            Bearish: Pump sonrası volume çökür → bir dəfəlik spike.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Volume trendi dəstəkləyir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Normal / qarışıq</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Volume tərsinə işləyir</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Hərəkət sonrası volume kəsilirsə, ehtiyatlı ol.</div>
+        </div>
+
+        <div class="item" data-id="11">
+          <div class="item-title">BLOCK 3 — Spot Orderbook</div>
+          <div class="item-desc">
+            Bullish: Real BID walls, spread daralır, absorption buy.<br>
+            Bearish: ASK walls, spoofing (ghost orders) hiss olunur.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Orderbook məni qoruyur</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / boşdur</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Orderbook mənə qarşı</button>
+          </div>
+          <div class="item-footer">Tapşırıq: “Divarların” real olub-olmadığını hiss et (tez çəkilib-silinirmi?).</div>
+        </div>
+
+        <div class="item" data-id="12">
+          <div class="item-title">BLOCK 4 — Spot Price Action</div>
+          <div class="item-desc">
+            Bullish siqnallar: HH/HL structure, low sweep → reclaim, bullish OB retest.<br>
+            Bearish siqnallar: LH/LF, high sweep → reject, bearish OB retest.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">PA trendi dəstəkləyir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Range / qarışıq</button>
+            <button class="item-btn" onclick="setScore(this,-1)">PA əleyhinə</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Son struktur break-lərinə (BOS, sweep) diqqət et.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 3 — EXTRA PRO INDICATORS -->
+    <div class="section" data-section="3">
+      <div class="section-header">
+        <div class="section-title">
+          🟪 Bölmə 3 — Extra PRO Indicators
+          <span class="badge">Trend davam etmə testi</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-3">0</span> / 6
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+      <div class="items">
+
+        <div class="item" data-id="13">
+          <div class="item-title">1) CVD (Cumulative Volume Delta)</div>
+          <div class="item-desc">
+            Bullish: CVD ↑ və Price ↑ → healthy trend.<br>
+            Kritik: Price ↑ amma CVD ↓ → fake pump / absorption sell.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">CVD price ilə eyni tərəfdə</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">CVD tərsinə</button>
+          </div>
+          <div class="item-footer">Tapşırıq: CVD divergence varsa, ehtiyatlı ol.</div>
+        </div>
+
+        <div class="item" data-id="14">
+          <div class="item-title">2) Liquidation Heatmap</div>
+          <div class="item-desc">
+            Bullish: Yuxarıda likvidity cluster (maqnit) → continuation.<br>
+            Bearish: Yuxarıda boşluq, aşağıda cluster → drop riski.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Likvidlik hədəfim tərəfdədir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / uzaqdır</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Likvidlik əks tərəfdədir</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Major cluster sənin direction-ı dəstəkləyirmi?</div>
+        </div>
+
+        <div class="item" data-id="15">
+          <div class="item-title">3) VWAP (Institution Anchor)</div>
+          <div class="item-desc">
+            Bullish: Price &gt; VWAP, VWAP retest entry üçün ideal.<br>
+            Bearish: Price &lt; VWAP → trend zəif / short bias.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Mən VWAP tərəfi ilə gedirəm</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">VWAP əleyhimə</button>
+          </div>
+          <div class="item-footer">Tapşırıq: VWAP-dan çox uzaq və əks tərəfdəsə, risk yüksəkdir.</div>
+        </div>
+
+        <div class="item" data-id="16">
+          <div class="item-title">4) Tape Reading — Time &amp; Sales</div>
+          <div class="item-desc">
+            Bullish: Ardıcıl yaşıl, 50k–300k buys, print-lər sürətlənir.<br>
+            Bearish: Qırmızı high-size prints, spoofing signs.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Tape mənim tərəfimdədir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / qarışıq</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Tape əleyhimədir</button>
+          </div>
+          <div class="item-footer">Tapşırıq: “Kim daha aqressivdir?” sualına cavab tap.</div>
+        </div>
+
+        <div class="item" data-id="17">
+          <div class="item-title">5) Funding Curve</div>
+          <div class="item-desc">
+            Bullish: Funding stabil və ya mənfi, amma trend ↑.<br>
+            Bearish: Current funding ↓ amma future funding ↑ → trap pattern.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Funding mənə uyğun</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / zəif</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Funding trap hiss olunur</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Funding dəyişmə trayektoriyasına bax, tək snapshot-a yox.</div>
+        </div>
+
+        <div class="item" data-id="18">
+          <div class="item-title">6) Implied Volatility (IV)</div>
+          <div class="item-desc">
+            Bullish: IV ↑ + Price ↑ → impuls sağlam, oynaqdır.<br>
+            Bearish: IV ↓ + Price ↑ → trend yorulub, çıxmaq vaxtıdır.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">IV trendi dəstəkləyir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
+            <button class="item-btn" onclick="setScore(this,-1)">IV əleyhinə</button>
+          </div>
+          <div class="item-footer">Tapşırıq: IV böyük düşübsə, artıq “axır metrosuna” minmiş ola bilərsən.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 4 — MARKET STRUCTURE -->
+    <div class="section" data-section="4">
+      <div class="section-header">
+        <div class="section-title">
+          🟥 Bölmə 4 — Market Structure (Macro & Micro)
+          <span class="badge">4H + local struktur</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-4">0</span> / 2
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+      <div class="items">
+
+        <div class="item" data-id="19">
+          <div class="item-title">1) 4H Macro Trend (EMA 50/200)</div>
+          <div class="item-desc">
+            Bullish regime: Price 4H EMA 50/200 üstündə; reclaim → ən güclü siqnallardan biridir.<br>
+            Bearish regime: Aşağısında → short bias.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Trade 4H rejimi ilə uyğundur</button>
+            <button class="item-btn" onclick="setScore(this,0)">Rejimdən əksinə, amma qısa scalp</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Rejim tam əleyhinə</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Macro rejimə qarşı full-size girmə.</div>
+        </div>
+
+        <div class="item" data-id="20">
+          <div class="item-title">2) Market Structure Zonal Rules</div>
+          <div class="item-desc">
+            Bullish: BOS up, FVG fill + continue, demand sweep → reclaim.<br>
+            Bearish: BOS down, supply retest, fail swing high → continuation.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">Local struktur setup-ı dəstəkləyir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Range / unclear</button>
+            <button class="item-btn" onclick="setScore(this,-1)">Struktur əleyhinə</button>
+          </div>
+          <div class="item-footer">Tapşırıq: Son BOS və sweep-lərə əsasən, trade zonanı düzgün seç.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECTION 5 — BTC REGIME -->
+    <div class="section" data-section="5">
+      <div class="section-header">
+        <div class="section-title">
+          🟧 Bölmə 5 — BTC Regime Filter
+          <span class="badge">Altcoinlər üçün MUST</span>
+        </div>
+        <div class="section-score">
+          Score: <span class="score-value" id="score-sec-5">0</span> / 1
+          <span class="collapse-icon">▼</span>
+        </div>
+      </div>
+      <div class="items">
+
+        <div class="item" data-id="21" data-hardfail="true">
+          <div class="item-title">
+            BTC Mood (OI, VWAP, Funding, Liquidity)
+            <span class="item-hardfail-flag">HARD-FAIL potensialı</span>
+          </div>
+          <div class="item-desc">
+            Bullish režim: BTC OI ↑ + Price ↑, VWAP üstündə, yuxarıda likvidity cluster.<br>
+            Bearish/trap: BTC OI ↑ + Price ↓, VWAP altında, funding çox yüksək.
+          </div>
+          <div class="item-actions">
+            <button class="item-btn" onclick="setScore(this,1)">BTC mənim setup-ımı dəstəkləyir</button>
+            <button class="item-btn" onclick="setScore(this,0)">Neutral / yan</button>
+            <button class="item-btn" onclick="setScore(this,-1)">BTC tam əleyhdə (Trap riski)</button>
+          </div>
+          <div class="item-footer">Tapşırıq: BTC əleyhinədirsə, altcoində aggressiv olmaq olmaz.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FINAL VERDICT CARD -->
+    <div class="final-card">
+      <div class="final-title">🚀 Final Decision Map</div>
+      <div class="final-score-line">
+        Overall Score: <span id="finalScoreText" class="score-value">0 / 21</span>
+      </div>
+      <div id="finalVerdict" class="final-verdict">Status: No data</div>
+      <div id="finalComment" class="final-note">
+        Checklist-i doldur, nəticə burada PRO dildə çıxacaq. Unutma: bu sistem
+        sənin öz analizini əvəz etmir, sadəcə strukturlaşdırır və hard-fail trap-ları flag edir.
+      </div>
+
+      <div class="export-box">
+        <div class="export-label">Telegram üçün Export (copy → paste):</div>
+        <textarea id="exportText" readonly></textarea>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // COLLAPSE SECTIONS
+  document.querySelectorAll(".section-header").forEach(hdr => {
+    hdr.addEventListener("click", (e) => {
+      // Buttons içində klikləməsin
+      if (e.target.closest("button")) return;
+      const sec = hdr.closest(".section");
+      if (!sec) return;
+      sec.classList.toggle("collapsed");
+    });
+  });
+  // Default: Bölmə 1 açıq, 2-5 collapse
+  document.querySelectorAll(".section[data-section]").forEach(sec => {
+    const id = parseInt(sec.dataset.section || "0", 10);
+    if (id > 1) sec.classList.add("collapsed");
+  });
+
+  function setScore(btn, score) {
+    const itemEl = btn.closest(".item");
+    if (!itemEl) return;
+
+    itemEl.dataset.score = score;
+
+    const buttons = itemEl.querySelectorAll(".item-btn");
+    buttons.forEach(b => b.classList.remove("active-support","active-neutral","active-against"));
+
+    if (score === 1) btn.classList.add("active-support");
+    else if (score === 0) btn.classList.add("active-neutral");
+    else if (score === -1) btn.classList.add("active-against");
+
+    recompute();
+  }
+
+  function sectionMax(sectionId) {
+    // According to design
+    const map = {1:8, 2:4, 3:6, 4:2, 5:1};
+    return map[sectionId] || 0;
+  }
+
+  function recompute() {
+    let totalScore = 0;
+    const sectionScores = {1:0,2:0,3:0,4:0,5:0};
+    let hardFail = false;
+
+    document.querySelectorAll(".item").forEach(item => {
+      const s = parseInt(item.dataset.score || "0", 10);
+      const sec = parseInt(item.closest(".section").dataset.section || "0", 10);
+      if (!isNaN(sec) && sec > 0) {
+        sectionScores[sec] = (sectionScores[sec] || 0) + s;
+      }
+      totalScore += s;
+
+      if (s === -1 && item.dataset.hardfail === "true") {
+        hardFail = true;
+      }
+    });
+
+    for (let sec = 1; sec <=5; sec++) {
+      const el = document.getElementById("score-sec-" + sec);
+      if (el) {
+        el.textContent = sectionScores[sec] + " / " + sectionMax(sec);
+      }
+    }
+
+    document.getElementById("overallScore").textContent = totalScore;
+    document.getElementById("finalScoreText").textContent = totalScore + " / 21";
+
+    // Hard-Fail status view
+    const hfStatus = document.getElementById("hfStatus");
+    if (hardFail) {
+      hfStatus.textContent = "Hard-Fail: VAR";
+      hfStatus.classList.remove("hf-ok");
+      hfStatus.classList.add("hf-bad");
+    } else {
+      hfStatus.textContent = "Hard-Fail: Yox";
+      hfStatus.classList.remove("hf-bad");
+      hfStatus.classList.add("hf-ok");
+    }
+
+    // Verdict mapping
+    let verdict = "";
+    let comment = "";
+    if (hardFail) {
+      verdict = "❌ HARD-FAIL — NO TRADE";
+      comment = "BTC trap / OI dynamics kimi kritik indikatorlardan biri sənin setup-ına qarşıdır. Score yüksək olsa belə bu treydi SKIP ET. Daha təmiz imkan gözlə.";
+    } else if (totalScore >= 13) {
+      verdict = "✅ HIGH CONVICTION SETUP — PRO Entry Allowed";
+      comment = "Futures impulse + Spot + Extra PRO + Struktur + BTC hamısı sənin tərəfindədir. Bu nadir yüksək keyfiyyətli setup-dır. Yenə də full risk deyil, planlı SL və ölçü ilə gir.";
+    } else if (totalScore >= 7) {
+      verdict = "🟢 OK / STRONG Setup — Normal Size";
+      comment = "Əksər bloklar sənin tərəfini dəstəkləyir. Entry mümkündür, amma zəif olan blokları (məsələn BTC və ya Spot) nəzərə al və riskini buna görə azald.";
+    } else if (totalScore >= 3) {
+      verdict = "🟡 MIXED Setup — Only Small Size / Scout";
+      comment = "Bəzi bloklar yaxşı, bəziləri əleyhinədir. Bu daha çox test-trade / small size üçündür. Emosional all-in etmək qətiyyən düzgün deyil.";
+    } else if (totalScore >= 0) {
+      verdict = "🟧 NO-TRADE ZONE — Çox zəif təsdiq";
+      comment = "PRO xəritəyə görə kifayət qədər alignment yoxdur. Səbr edib daha təmiz və daha güclü setup gözləmək uzun müddətdə daha sərfəlidir.";
+    } else {
+      verdict = "🔴 AVOID / CONTRARIAN ONLY";
+      comment = "Ümumi skor mənfidir. Bu ya tam əleyhinə siqnaldır, ya da yalnız çox təcrübəli kontrarian üçün qısa scalp dəyər. Normal treyd üçün uyğun deyil.";
+    }
+
+    document.getElementById("finalVerdict").textContent = verdict;
+    document.getElementById("finalComment").textContent = comment;
+
+    buildExport(sectionScores, totalScore, verdict, hardFail);
+  }
+
+  function resetAll() {
+    document.querySelectorAll(".item").forEach(item => {
+      delete item.dataset.score;
+      const buttons = item.querySelectorAll(".item-btn");
+      buttons.forEach(b => b.classList.remove("active-support","active-neutral","active-against"));
+    });
+    recompute();
+    document.getElementById("exportText").value = "";
+  }
+
+  function buildExport(sectionScores, totalScore, verdict, hardFail) {
+    let text = "";
+    text += "📌 PRO Trend Verification — FULL MODE V2\n";
+    text += "----------------------------------------\n";
+    text += "🟦 Futures Impulse: " + sectionScores[1] + " / 8\n";
+    text += "🟩 Spot Confirmation: " + sectionScores[2] + " / 4\n";
+    text += "🟪 Extra PRO: " + sectionScores[3] + " / 6\n";
+    text += "🟥 Market Structure: " + sectionScores[4] + " / 2\n";
+    text += "🟧 BTC Regime: " + sectionScores[5] + " / 1\n\n";
+    text += "📊 Overall Score: " + totalScore + " / 21\n";
+    text += "⚙️ Hard-Fail: " + (hardFail ? "VAR (NO-TRADE)\n" : "Yox\n");
+    text += "🧾 Verdict: " + verdict + "\n";
+
+    document.getElementById("exportText").value = text;
+  }
+
+  function exportSummary() {
+    const ta = document.getElementById("exportText");
+    ta.focus();
+    ta.select();
+  }
+
+  // init
+  recompute();
+</script>
+</body>
+</html>
