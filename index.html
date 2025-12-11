@@ -44,7 +44,7 @@
     }
 
     html, body {
-      touch-action: pan-x pan-y;
+      /* touch-action silindi ki, iOS PWA-da pinch-zoom bloklanmasın */
     }
 
     body {
@@ -58,8 +58,8 @@
     textarea {
       -webkit-user-select: text;
       user-select: text;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
+      overflow-y: auto;
+      /* -webkit-overflow-scrolling: touch silindi (zoom/scroll konfliktlərini azaltmaq üçün) */
     }
 
     .app {
@@ -352,8 +352,7 @@
       font-size: 0.68rem;
       padding: 6px;
       resize: vertical;
-      overflow-y: auto !important;
-      -webkit-overflow-scrolling: touch !important;
+      overflow-y: auto;
       max-height: 200px;
     }
 
@@ -387,7 +386,7 @@
       padding: 4px;
       background: #020617;
       font-size: 0.68rem;
-      -webkit-overflow-scrolling: touch;
+      /* -webkit-overflow-scrolling: touch silindi (zoom/scroll konfliktləri azaltmaq üçün) */
     }
 
     .trade-log-entry {
@@ -936,7 +935,7 @@
           <button class="btn small" onclick="importJournalJson()">Import JSON</button>
         </div>
         <input id="importFile" type="file" accept="application/json,text/*" style="display:none" />
-        <div id="tradeLogList" class="trade-log-list"></div>
+        <div id="tradeLogList" class="tradeLogList trade-log-list"></div>
       </div>
 
       <!-- SESSION COMPARISON TOOL (V2.1) -->
@@ -971,8 +970,7 @@
 <!-- iOS textarea scroll fix (alt sətirlər kəsilməsin) -->
 <style>
   #exportText {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
+    overflow-y: auto;
     max-height: 220px;
   }
 </style>
@@ -1352,6 +1350,7 @@
         html += `<div class="trade-log-entry">
           <div class="trade-log-entry-header">
             [${formatTimestamp(entry.ts)}] ${entry.symbol || "N/A"} ${entry.tf ? "(" + entry.tf + ")" : ""}
+
           </div>
           <div class="trade-log-entry-meta">
             Mode: ${entry.mode} — Score: ${entry.totalScore} / 21, Hard-Fail: ${entry.hardFail ? "VAR" : "Yox"}
@@ -1657,277 +1656,3 @@
         maxDiffStr =
           `${secNames[i]} — A: ${sa}, B: ${sb}, fərq: ${diff > 0 ? "+" + diff : diff}`;
       }
-
-      html += `
-        <div class="trade-log-entry-meta">
-          ${secNames[i]}: A = ${sa}, B = ${sb}, Δ = ${diff > 0 ? "+" + diff : diff}
-        </div>
-      `;
-    }
-
-    html += `</div>`;
-
-    const totalA = A.totalScore != null ? A.totalScore : 0;
-    const totalB = B.totalScore != null ? B.totalScore : 0;
-    const totalDiff = totalB - totalA;
-    const totalAbsDiff = Math.abs(totalDiff);
-    const totalConsistency = Math.max(0, 1 - totalAbsDiff / 21);
-
-    let avgConsistency = consistencyCount > 0 ? consistencySum / consistencyCount : 0;
-
-    const totalConsistencyPct = Math.round(totalConsistency * 100);
-    const avgConsistencyPct = Math.round(avgConsistency * 100);
-
-    html += `<div class="trade-log-entry">
-      <div class="trade-log-entry-header">Consistency Metrics</div>
-      <div class="trade-log-entry-meta">
-        Total Score A: ${totalA} / 21, B: ${totalB} / 21, Δ = ${totalDiff > 0 ? "+" + totalDiff : totalDiff}
-      </div>
-      <div class="trade-log-entry-meta">
-        Overall Consistency (Total Score): ${totalConsistencyPct}%
-      </div>
-      <div class="trade-log-entry-meta">
-        Average Section Consistency: ${avgConsistencyPct}%
-      </div>
-    `;
-
-    if (maxDiffSec != null && maxDiff > 0) {
-      html += `
-        <div class="trade-log-entry-meta">
-          Ən böyük fərq: ${maxDiffStr}
-        </div>
-      `;
-    }
-
-    if (A.hardFail || B.hardFail) {
-      html += `
-        <div class="trade-log-entry-meta">
-          Hard-Fail davranışı: A → ${A.hardFail ? "VAR" : "Yox"}, B → ${B.hardFail ? "VAR" : "Yox"}.
-        </div>
-      `;
-    }
-
-    html += `</div>`;
-
-    resBox.innerHTML = html;
-  }
-
-  // Əsas engine — real-time scoring
-  function recompute() {
-    let total = 0;
-    let hardFail = false;
-    const secScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-
-    document.querySelectorAll(".item").forEach((item) => {
-      const raw = parseInt(item.dataset.score || "0", 10);
-      const s = raw;
-
-      const secEl = item.closest(".section");
-      const sec = secEl ? parseInt(secEl.dataset.section || "0", 10) : 0;
-
-      if (sec > 0) secScores[sec] += s;
-      total += s;
-
-      if (raw === -1 && item.dataset.hardfail === "true") {
-        hardFail = true;
-      }
-    });
-
-    // Bölmə skorları
-    for (let i = 1; i <= 5; i++) {
-      const el = document.getElementById("score-sec-" + i);
-      if (el) el.textContent = `${secScores[i]} / ${sectionMax(i)}`;
-    }
-
-    // Overall skor
-    const overallEl = document.getElementById("overallScore");
-    if (overallEl) overallEl.textContent = total;
-
-    const finalScoreText = document.getElementById("finalScoreText");
-    if (finalScoreText) finalScoreText.textContent = `${total} / 21`;
-
-    // Hard-Fail statusu
-    const hf = document.getElementById("hfStatus");
-    if (hf) {
-      if (hardFail) {
-        hf.textContent = "Hard-Fail: VAR";
-        hf.classList.remove("hf-ok");
-        hf.classList.add("hf-bad");
-      } else {
-        hf.textContent = "Hard-Fail: Yox";
-        hf.classList.remove("hf-bad");
-        hf.classList.add("hf-ok");
-      }
-    }
-
-    // Verdict
-    const result = buildVerdict(total, hardFail);
-    const verdictEl = document.getElementById("finalVerdict");
-    const commentEl = document.getElementById("finalComment");
-
-    if (verdictEl) verdictEl.textContent = result.verdict;
-    if (commentEl) commentEl.textContent = result.comment;
-
-    // Export panelini yenilə (Telegram text)
-    buildExport(secScores, total, result.verdict, hardFail);
-
-    // Son nəticələri yadda saxla (trade log üçün)
-    lastTotals = {
-      total,
-      secScores,
-      hardFail,
-      verdict: result.verdict
-    };
-
-    // LocalStorage state save
-    saveStateToStorage();
-  }
-
-  // Reset All
-  function resetAll() {
-    document.querySelectorAll(".item").forEach((item) => {
-      delete item.dataset.score;
-      item
-        .querySelectorAll(".item-btn")
-        .forEach((btn) =>
-          btn.classList.remove(
-            "active-support",
-            "active-neutral",
-            "active-against"
-          )
-        );
-    });
-
-    const ta = document.getElementById("exportText");
-    if (ta) ta.value = "";
-
-    recompute();
-  }
-
-  // Copy Export düyməsi
-  async function copyExport() {
-    const ta = document.getElementById("exportText");
-    if (!ta) return;
-
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(ta.value);
-      } else {
-        ta.focus();
-        ta.select();
-        document.execCommand("copy");
-      }
-      alert("Export kopyalandı ✔");
-    } catch (err) {
-      alert("Copy alınmadı, mətni əl ilə seç.");
-    }
-  }
-
-  // iOS keyboard alt sətir fix
-  document.addEventListener("focusin", (e) => {
-    if (e.target.tagName === "TEXTAREA") {
-      setTimeout(() => {
-        window.scrollTo(0, document.body.scrollHeight);
-      }, 200);
-    }
-  });
-
-  // ===========================
-  // OFFLINE UPDATE SYSTEM (TOAST)
-  // ===========================
-  let newWorker = null;
-
-  function showUpdateToast(worker) {
-    const toast = document.getElementById("updateToast");
-    if (!toast) return;
-    newWorker = worker;
-    toast.style.display = "flex";
-  }
-
-  function hideUpdateToast() {
-    const toast = document.getElementById("updateToast");
-    if (toast) toast.style.display = "none";
-  }
-
-  // DOMContentLoaded: toast düymələri + LONG/SHORT mode + LocalStorage load
-  document.addEventListener("DOMContentLoaded", () => {
-    const refreshBtn = document.getElementById("updateRefreshBtn");
-    const dismissBtn = document.getElementById("updateDismissBtn");
-
-    if (refreshBtn) {
-      refreshBtn.addEventListener("click", () => {
-        if (newWorker) {
-          newWorker.postMessage({ type: "SKIP_WAITING" });
-        }
-      });
-    }
-
-    if (dismissBtn) {
-      dismissBtn.addEventListener("click", hideUpdateToast);
-    }
-
-    initModeTexts();
-
-    // Mode düymələri
-    const btnLong = document.getElementById("modeLong");
-    const btnShort = document.getElementById("modeShort");
-    if (btnLong) btnLong.addEventListener("click", () => setMode("LONG"));
-    if (btnShort) btnShort.addEventListener("click", () => setMode("SHORT"));
-
-    // LocalStorage-dan state oxu
-    const savedState = loadStateFromStorage();
-    if (savedState && savedState.mode === "SHORT") {
-      setMode("SHORT");
-    } else {
-      setMode("LONG");
-    }
-
-    if (savedState && savedState.scores) {
-      applySavedScores(savedState.scores);
-      recompute();
-    } else {
-      recompute();
-    }
-
-    // Trade log-u yüklə
-    loadTradeLog();
-  });
-
-  // Service Worker qeydiyyatı + update detection
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("service-worker.js")
-        .then((registration) => {
-          if (registration.waiting) {
-            showUpdateToast(registration.waiting);
-          }
-
-          registration.addEventListener("updatefound", () => {
-            const installing = registration.installing;
-            if (!installing) return;
-
-            installing.addEventListener("statechange", () => {
-              if (
-                installing.state === "installed" &&
-                navigator.serviceWorker.controller
-              ) {
-                showUpdateToast(installing);
-              }
-            });
-          });
-        })
-        .catch((err) => console.log("SW registration failed:", err));
-    });
-
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      window.location.reload();
-    });
-  }
-
-  // İlk hesablama
-  recompute();
-</script>
-
-</body>
-</html>
