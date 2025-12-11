@@ -2,7 +2,7 @@
   "name": "PRO Trend Verification Map V2.1",
   "short_name": "PRO Trend Map",
   "description": "Offline PRO Trend Verification Checklist for Futures Trading (LONG/SHORT, Journal, Session Comparison V2.1)",
-  "start_url": "index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#000000",
