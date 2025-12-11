@@ -1,4 +1,4 @@
-const CACHE_NAME = "pro-trend-cache-v3"; // Yeni versiya → v3 (Session Comparison V2.1)
+const CACHE_NAME = "pro-trend-cache-v3"; // Session Comparison V2.1
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
@@ -30,7 +30,7 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// FETCH — offline support (network + fallback)
+// FETCH — offline support (cache-first + network fallback, sonra index.html fallback)
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") {
     return;
