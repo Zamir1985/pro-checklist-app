@@ -1,11 +1,8 @@
-// =========================
-// FILE: manifest.json
-// =========================
 {
   "name": "PRO Trend Verification Map V2.1",
   "short_name": "PRO Trend Map",
   "description": "Offline PRO Trend Verification Checklist for Futures Trading (LONG/SHORT, Journal, Session Comparison V2.1)",
-  "id": "./",
+  "id": "/",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
