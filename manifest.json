@@ -1,27 +1,20 @@
+// =========================
+// FILE: manifest.json
+// =========================
 {
   "name": "PRO Trend Verification Map V2.1",
   "short_name": "PRO Trend Map",
   "description": "Offline PRO Trend Verification Checklist for Futures Trading (LONG/SHORT, Journal, Session Comparison V2.1)",
-  "start_url": "./",
+  "id": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#000000",
+  "orientation": "portrait",
   "icons": [
-    {
-      "src": "pro_icon.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "pro_icon.png",
-      "sizes": "256x256",
-      "type": "image/png"
-    },
-    {
-      "src": "pro_icon.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "pro_icon.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "pro_icon.png", "sizes": "256x256", "type": "image/png" },
+    { "src": "pro_icon.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
