@@ -1,27 +1,30 @@
+<!-- =========================
+FILE: index.html
+========================= -->
 <!DOCTYPE html>
 <html lang="az">
 <head>
   <meta charset="UTF-8" />
-  <title>PRO Trend Verification Map V2 — Offline Checklist</title>
+  <title>PRO Trend Verification Map V2.1 — Offline Checklist</title>
 
-  <!-- Mobile viewport optimizations -->
+  <!-- iOS 26 / PWA: zoom açıq + safe-area -->
   <meta name="viewport"
         content="width=device-width, initial-scale=1,
                  maximum-scale=5, user-scalable=yes,
                  viewport-fit=cover" />
 
-  <!-- App Icon -->
+  <!-- PWA / iOS -->
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Icons -->
   <link rel="apple-touch-icon" sizes="180x180" href="pro_icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="pro_icon.png">
   <link rel="icon" type="image/png" sizes="16x16" href="pro_icon.png">
 
-  <!-- PWA Manifest -->
+  <!-- Manifest -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#000000">
-
-  <!-- iOS Safari Fullscreen Mode -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <style>
     :root {
@@ -43,9 +46,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html, body {
-      /* touch-action silindi ki, iOS PWA-da pinch-zoom bloklanmasın */
-    }
+    html, body { height: 100%; }
 
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -53,18 +54,19 @@
       color: var(--text);
       padding: 8px;
       overscroll-behavior: none;
+      -webkit-text-size-adjust: 100%;
     }
 
-    textarea {
+    /* iOS: input/textarea seçimi normal qalsın */
+    input, textarea {
       -webkit-user-select: text;
       user-select: text;
-      overflow-y: auto;
-      /* -webkit-overflow-scrolling: touch silindi (zoom/scroll konfliktlərini azaltmaq üçün) */
     }
 
     .app {
       max-width: 900px;
       margin: 0 auto 32px auto;
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     h1 {
@@ -93,11 +95,7 @@
       border: 1px solid #374151;
       color: var(--muted);
     }
-
-    .pill.critical {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .pill.critical { border-color: var(--accent); color: var(--accent); }
 
     .btn {
       border-radius: 999px;
@@ -107,6 +105,11 @@
       padding: 4px 10px;
       font-size: 0.72rem;
       cursor: pointer;
+
+      /* iOS 26: tap responsiv + zoom-a toxunmur (yalnız düymələrdə) */
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .btn.primary {
@@ -144,7 +147,6 @@
       margin-left: 6px;
       font-size: 0.72rem;
     }
-
     .hf-ok { color: var(--success); }
     .hf-bad { color: var(--danger); }
 
@@ -174,6 +176,7 @@
       border-radius: 12px;
       padding: 6px 8px 7px;
       border: 1px solid #111827;
+      will-change: transform;
     }
 
     .section-header {
@@ -183,6 +186,8 @@
       gap: 6px;
       margin-bottom: 4px;
       cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .section-title {
@@ -201,11 +206,7 @@
       color: var(--muted);
       white-space: nowrap;
     }
-
-    .badge.critical {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+    .badge.critical { border-color: var(--accent); color: var(--accent); }
 
     .section-score {
       font-size: 0.7rem;
@@ -217,22 +218,19 @@
       font-size: 0.7rem;
       color: var(--muted);
       margin-left: 4px;
+      display: inline-block;
+      transition: transform 120ms ease, opacity 120ms ease;
     }
 
-    .section.collapsed .items {
-      display: none;
-    }
-
-    .section.collapsed .collapse-icon {
-      transform: rotate(-90deg);
-      opacity: 0.7;
-    }
+    .section.collapsed .items { display: none; }
+    .section.collapsed .collapse-icon { transform: rotate(-90deg); opacity: 0.7; }
 
     .item {
       background: var(--card);
       border-radius: 9px;
       padding: 5px 6px;
       border: 1px solid #020617;
+      margin-top: 6px;
     }
 
     .item-title {
@@ -264,6 +262,11 @@
       color: var(--muted);
       cursor: pointer;
       white-space: nowrap;
+
+      /* iOS 26 tap stabilliyi */
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .item-btn.active-support {
@@ -284,16 +287,10 @@
       color: #fee2e2;
     }
 
-    .item-footer {
-      margin-top: 2px;
-      font-size: 0.64rem;
-      color: #6b7280;
-    }
-
     .item-hardfail-flag {
       font-size: 0.6rem;
       color: var(--danger);
-      font-weight: 600;
+      font-weight: 700;
       margin-left: 4px;
     }
 
@@ -318,7 +315,7 @@
 
     .final-verdict {
       font-size: 0.85rem;
-      font-weight: 700;
+      font-weight: 800;
       margin-bottom: 3px;
     }
 
@@ -353,10 +350,10 @@
       padding: 6px;
       resize: vertical;
       overflow-y: auto;
-      max-height: 200px;
+      max-height: 220px;
     }
 
-    /* Trade log (LocalStorage) */
+    /* Trade log */
     .trade-log-inputs {
       display: flex;
       flex-wrap: wrap;
@@ -386,7 +383,6 @@
       padding: 4px;
       background: #020617;
       font-size: 0.68rem;
-      /* -webkit-overflow-scrolling: touch silindi (zoom/scroll konfliktləri azaltmaq üçün) */
     }
 
     .trade-log-entry {
@@ -395,26 +391,22 @@
       line-height: 1.25;
     }
 
-    .trade-log-entry:last-child {
-      border-bottom: none;
-    }
+    .trade-log-entry:last-child { border-bottom: none; }
 
     .trade-log-entry-header {
-      font-weight: 600;
+      font-weight: 700;
       color: var(--accent);
     }
 
-    .trade-log-entry-meta {
-      color: var(--muted);
-    }
+    .trade-log-entry-meta { color: var(--muted); }
 
-    /* Update toast (offline update system) */
+    /* Update toast */
     .update-toast {
       position: fixed;
       left: 50%;
-      bottom: 12px;
+      bottom: calc(12px + env(safe-area-inset-bottom));
       transform: translateX(-50%);
-      max-width: 90%;
+      max-width: 92%;
       background: rgba(15, 23, 42, 0.98);
       border-radius: 999px;
       border: 1px solid #4b5563;
@@ -430,22 +422,21 @@
       font-size: 0.72rem;
       color: var(--muted);
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 55vw;
     }
 
     .update-toast-actions {
       display: flex;
       gap: 4px;
+      flex-shrink: 0;
     }
 
     @media (max-width: 600px) {
-      .top-bar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .mode-switch {
-        margin-left: 0;
-      }
+      .top-bar { flex-direction: column; align-items: flex-start; }
+      .mode-switch { margin-left: 0; }
+      .update-toast-text { max-width: 50vw; }
     }
   </style>
 </head>
@@ -453,10 +444,11 @@
 <body>
 <div class="app">
 
-  <h1>PRO Trend Verification Map — FULL MODE V2</h1>
+  <h1>PRO Trend Verification Map — FULL MODE V2.1</h1>
   <div class="subtitle">
     START siqnalından sonra 10–20 saniyəyə bütün PRO xəritəni yoxlamaq üçün offline checklist.
-    V2: Hard-Fail sistemi, kompakt UI, collapse bölmələr, Telegram export, LONG/SHORT REAL MODE, LocalStorage Trade Log, JSON Export/Import, Session Comparison V2.1.
+    V2.1: Hard-Fail sistemi, kompakt UI, collapse bölmələr, Telegram export, LONG/SHORT REAL MODE,
+    LocalStorage Trade Log, JSON Export/Import, Session Comparison V2.1.
   </div>
 
   <div class="pill-row">
@@ -470,24 +462,24 @@
 
   <div class="top-bar">
     <div style="display:flex;gap:6px;flex-wrap:wrap;">
-      <button class="btn primary" onclick="resetAll()">Reset All</button>
-      <button class="btn small" onclick="copyExport()">Copy Export</button>
+      <button id="btnResetAll" class="btn primary" type="button">Reset All</button>
+      <button id="btnCopyExport" class="btn small" type="button">Copy Export</button>
     </div>
     <div class="score-bar">
       Overall Score: <span id="overallScore" class="score-value">0</span> / 21
       <span id="hfStatus" class="hf-flag hf-ok">Hard-Fail: Yox</span>
     </div>
     <div class="mode-switch">
-      <button id="modeLong" class="btn small active-mode">LONG</button>
-      <button id="modeShort" class="btn small">SHORT</button>
+      <button id="modeLong" class="btn small active-mode" type="button">LONG</button>
+      <button id="modeShort" class="btn small" type="button">SHORT</button>
     </div>
   </div>
 
-  <div class="sections">
+  <div class="sections" id="sectionsRoot">
 
-    <!-- SECTION 0 — DECISION FILTER -->
+    <!-- SECTION 0 -->
     <div class="section">
-      <div class="section-header">
+      <div class="section-header" role="button" aria-label="Collapse Section 0">
         <div class="section-title">
           🔵 0. Qərar Filteri
           <span class="badge critical">İlk 5–10 saniyə</span>
@@ -504,9 +496,9 @@
       </div>
     </div>
 
-    <!-- SECTION 1 — FUTURES IMPULSE -->
+    <!-- SECTION 1 -->
     <div class="section" data-section="1">
-      <div class="section-header">
+      <div class="section-header" role="button" aria-label="Collapse Section 1">
         <div class="section-title">🟦 Bölmə 1 — Futures REAL Impulse Check
           <span class="badge critical">Ən vacib 8 punkt</span>
         </div>
@@ -517,8 +509,6 @@
       </div>
 
       <div class="items">
-
-        <!-- ITEM 1 -->
         <div class="item" data-id="1">
           <div class="item-title">1) Taker Buy/Sell Flow (Δ Taker)</div>
           <div class="item-desc">
@@ -526,13 +516,12 @@
             Kritik: Price ↑ amma buy zəif → fake pump riski.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against / Trap</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against / Trap</button>
           </div>
         </div>
 
-        <!-- ITEM 2 -->
         <div class="item" data-id="2">
           <div class="item-title">2) Basis (Futures vs Spot Premium)</div>
           <div class="item-desc">
@@ -540,13 +529,12 @@
             Kritik: Basis stabil / kəskin ↑, amma price zəif → manip risk.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against / Trap</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against / Trap</button>
           </div>
         </div>
 
-        <!-- ITEM 3 -->
         <div class="item" data-id="3">
           <div class="item-title">3) OI / Market Cap Ratio</div>
           <div class="item-desc">
@@ -554,13 +542,12 @@
             Kritik: Ratio ↓ + Price ↑ → trend yorğun, late long riski.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 4 (HARD FAIL) -->
         <div class="item" data-id="4" data-hardfail="true">
           <div class="item-title">
             4) OI Dynamics — 4 Davranış
@@ -574,13 +561,12 @@
             ↓OI + ↓Price → trend bitir, NO-TRADE
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports Setup</button>
-            <button class="item-btn" onclick="setScore(this,0)">Mixed</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Trap / NO-TRADE</button>
+            <button class="item-btn" data-score="1" type="button">Supports Setup</button>
+            <button class="item-btn" data-score="0" type="button">Mixed</button>
+            <button class="item-btn" data-score="-1" type="button">Trap / NO-TRADE</button>
           </div>
         </div>
 
-        <!-- ITEM 5 -->
         <div class="item" data-id="5">
           <div class="item-title">5) Notional OI</div>
           <div class="item-desc">
@@ -588,13 +574,12 @@
             Kritik: Notional stabil / ↓, amma Price ↑ → retail-only pump.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 6 -->
         <div class="item" data-id="6">
           <div class="item-title">6) Top Trader Account Ratio</div>
           <div class="item-desc">
@@ -602,13 +587,12 @@
             Kritik: Retail hamısı long → FOMO, LONG üçün riskli zona.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Good</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Bad / Crowded</button>
+            <button class="item-btn" data-score="1" type="button">Good</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Bad / Crowded</button>
           </div>
         </div>
 
-        <!-- ITEM 7 -->
         <div class="item" data-id="7">
           <div class="item-title">7) Top Trader Position Ratio</div>
           <div class="item-desc">
@@ -616,13 +600,12 @@
             Ziddiyyət varsa — ehtiyat, position sizing-i kiçilt.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Pros with me</button>
-            <button class="item-btn" onclick="setScore(this,0)">Mixed</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Opposite</button>
+            <button class="item-btn" data-score="1" type="button">Pros with me</button>
+            <button class="item-btn" data-score="0" type="button">Mixed</button>
+            <button class="item-btn" data-score="-1" type="button">Opposite</button>
           </div>
         </div>
 
-        <!-- ITEM 8 -->
         <div class="item" data-id="8">
           <div class="item-title">8) Global Long/Short Ratio</div>
           <div class="item-desc">
@@ -630,19 +613,17 @@
             Bearish (LONG üçün): Global çox yüksəkdirsə (crowded longs) → risk.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Good</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+            <button class="item-btn" data-score="1" type="button">Good</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Bad</button>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- SECTION 2 — SPOT CONFIRMATION -->
+    <!-- SECTION 2 -->
     <div class="section" data-section="2">
-
-      <div class="section-header">
+      <div class="section-header" role="button" aria-label="Collapse Section 2">
         <div class="section-title">
           🟩 Bölmə 2 — Spot Confirmation (4 blok)
           <span class="badge">Trend davamı</span>
@@ -654,8 +635,6 @@
       </div>
 
       <div class="items">
-
-        <!-- ITEM 9 -->
         <div class="item" data-id="9">
           <div class="item-title">BLOCK 1 — Spot Money Flow</div>
           <div class="item-desc">
@@ -663,13 +642,12 @@
             Bearish (LONG üçün): Net outflow, sell walls → pump dayanıqsızdır.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 10 -->
         <div class="item" data-id="10">
           <div class="item-title">BLOCK 2 — Spot Volume</div>
           <div class="item-desc">
@@ -677,13 +655,12 @@
             Bearish (LONG üçün): Volume sönür → continuation zəifləyir.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Good</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+            <button class="item-btn" data-score="1" type="button">Good</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Bad</button>
           </div>
         </div>
 
-        <!-- ITEM 11 -->
         <div class="item" data-id="11">
           <div class="item-title">BLOCK 3 — Spot Orderbook</div>
           <div class="item-desc">
@@ -691,13 +668,12 @@
             Bearish (LONG üçün): Yuxarıda ASK walls + spoofing → trap riski.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 12 -->
         <div class="item" data-id="12">
           <div class="item-title">BLOCK 4 — Spot Price Action</div>
           <div class="item-desc">
@@ -705,19 +681,17 @@
             Bearish (LONG üçün): LH/LF → reversal risk, LONG üçün zəifdir.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- SECTION 3 — EXTRA PRO -->
+    <!-- SECTION 3 -->
     <div class="section" data-section="3">
-
-      <div class="section-header">
+      <div class="section-header" role="button" aria-label="Collapse Section 3">
         <div class="section-title">
           🟪 Bölmə 3 — Extra PRO Indicators
           <span class="badge">Detallı analiz</span>
@@ -729,8 +703,6 @@
       </div>
 
       <div class="items">
-
-        <!-- ITEM 13 -->
         <div class="item" data-id="13">
           <div class="item-title">1) CVD (Cumulative Volume Delta)</div>
           <div class="item-desc">
@@ -738,13 +710,12 @@
             Divergence (Price ↑, CVD ↓) → riskli continuation.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 14 -->
         <div class="item" data-id="14">
           <div class="item-title">2) Liquidation Heatmap</div>
           <div class="item-desc">
@@ -752,13 +723,12 @@
             Aşağıda böyük cluster → aşağıya dartma riski (LONG üçün təhlükə).
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 15 -->
         <div class="item" data-id="15">
           <div class="item-title">3) VWAP</div>
           <div class="item-desc">
@@ -766,13 +736,12 @@
             Bearish (LONG üçün): Price < VWAP və reject → LONG üçün zəif zona.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 16 -->
         <div class="item" data-id="16">
           <div class="item-title">4) Tape Reading</div>
           <div class="item-desc">
@@ -780,13 +749,12 @@
             Bearish (LONG üçün): qırmızı high-size prints, buyer-lar geri çəkilir.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Good</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+            <button class="item-btn" data-score="1" type="button">Good</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Bad</button>
           </div>
         </div>
 
-        <!-- ITEM 17 -->
         <div class="item" data-id="17">
           <div class="item-title">5) Funding Curve</div>
           <div class="item-desc">
@@ -794,13 +762,12 @@
             Bearish (LONG üçün): funding kəskin ↑ + crowded longs → trap riski.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 18 -->
         <div class="item" data-id="18">
           <div class="item-title">6) Implied Volatility (IV)</div>
           <div class="item-desc">
@@ -808,19 +775,17 @@
             IV ↓ + Price ↑ → daha sakit continuation, leverage azalıb.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Good</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+            <button class="item-btn" data-score="1" type="button">Good</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Bad</button>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- SECTION 4 — MARKET STRUCTURE -->
+    <!-- SECTION 4 -->
     <div class="section" data-section="4">
-
-      <div class="section-header">
+      <div class="section-header" role="button" aria-label="Collapse Section 4">
         <div class="section-title">
           🟥 Bölmə 4 — Market Structure
           <span class="badge">4H + Local</span>
@@ -832,8 +797,6 @@
       </div>
 
       <div class="items">
-
-        <!-- ITEM 19 -->
         <div class="item" data-id="19">
           <div class="item-title">1) 4H Macro Trend</div>
           <div class="item-desc">
@@ -841,13 +804,12 @@
             Bearish (LONG üçün): EMA-ların altında → LONG üçün əks trend.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against</button>
           </div>
         </div>
 
-        <!-- ITEM 20 -->
         <div class="item" data-id="20">
           <div class="item-title">2) Local Structure</div>
           <div class="item-desc">
@@ -855,19 +817,17 @@
             BOS down → local trend əksinə, LONG üçün riskli zona.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Good</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Bad</button>
+            <button class="item-btn" data-score="1" type="button">Good</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Bad</button>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- SECTION 5 — BTC REGIME -->
+    <!-- SECTION 5 -->
     <div class="section" data-section="5">
-
-      <div class="section-header">
+      <div class="section-header" role="button" aria-label="Collapse Section 5">
         <div class="section-title">
           🟧 Bölmə 5 — BTC Regime
           <span class="badge">Altcoin Must</span>
@@ -879,8 +839,6 @@
       </div>
 
       <div class="items">
-
-        <!-- ITEM 21 (HARD FAIL) -->
         <div class="item" data-id="21" data-hardfail="true">
           <div class="item-title">
             BTC Mood (OI, VWAP, Liquidity)
@@ -891,30 +849,24 @@
             Bearish (LONG üçün): OI ↑ + Price ↓ → BTC-də trap / risk rejimi, NO-TRADE.
           </div>
           <div class="item-actions">
-            <button class="item-btn" onclick="setScore(this,1)">Supports</button>
-            <button class="item-btn" onclick="setScore(this,0)">Neutral</button>
-            <button class="item-btn" onclick="setScore(this,-1)">Against / NO-TRADE</button>
+            <button class="item-btn" data-score="1" type="button">Supports</button>
+            <button class="item-btn" data-score="0" type="button">Neutral</button>
+            <button class="item-btn" data-score="-1" type="button">Against / NO-TRADE</button>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- FINAL CARD + JOURNAL / SESSION TOOLS -->
+    <!-- FINAL CARD -->
     <div class="final-card">
-
       <div class="final-title">🚀 Final Decision Map</div>
 
       <div class="final-score-line">
-        Overall Score:
-        <span id="finalScoreText" class="score-value">0 / 21</span>
+        Overall Score: <span id="finalScoreText" class="score-value">0 / 21</span>
       </div>
 
       <div id="finalVerdict" class="final-verdict">Status: No data</div>
-
-      <div id="finalComment" class="final-note">
-        Checklist-i doldur, nəticə burada real-time yenilənəcək.
-      </div>
+      <div id="finalComment" class="final-note">Checklist-i doldur, nəticə burada real-time yenilənəcək.</div>
 
       <div class="export-box">
         <div class="export-label">Telegram üçün Export:</div>
@@ -922,173 +874,222 @@
       </div>
 
       <div class="export-box">
-        <div class="export-label">
-          Local Trade Log (yalnız bu cihazda saxlanılır):
-        </div>
+        <div class="export-label">Local Trade Log (yalnız bu cihazda saxlanılır):</div>
         <div class="trade-log-inputs">
           <input id="logSymbol" placeholder="Pair (məs: BTCUSDT)" />
           <input id="logTF" placeholder="TF (məs: 5m / 15m)" />
         </div>
-        <button class="btn small" onclick="saveTradeLog()">Bu setup-ı Log et</button>
+        <button id="btnSaveTrade" class="btn small" type="button">Bu setup-ı Log et</button>
+
         <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap;">
-          <button class="btn small" onclick="exportJournalJson()">Export JSON</button>
-          <button class="btn small" onclick="importJournalJson()">Import JSON</button>
+          <button id="btnExportJson" class="btn small" type="button">Export JSON</button>
+          <button id="btnImportJson" class="btn small" type="button">Import JSON</button>
         </div>
+
         <input id="importFile" type="file" accept="application/json,text/*" style="display:none" />
-        <div id="tradeLogList" class="tradeLogList trade-log-list"></div>
+        <div id="tradeLogList" class="trade-log-list"></div>
       </div>
 
-      <!-- SESSION COMPARISON TOOL (V2.1) -->
       <div class="export-box">
-        <div class="export-label">
-          Session Comparison (V2.1) — 2 fərqli setup-ı yan-yana müqayisə et:
-        </div>
+        <div class="export-label">Session Comparison (V2.1) — 2 fərqli setup-ı yan-yana müqayisə et:</div>
         <div class="trade-log-inputs">
           <select id="sessionA"></select>
           <select id="sessionB"></select>
         </div>
-        <button class="btn small" onclick="compareSessions()">Compare Sessions</button>
+        <button id="btnCompareSessions" class="btn small" type="button">Compare Sessions</button>
         <div id="sessionCompareResult" class="trade-log-list" style="margin-top:4px;"></div>
       </div>
-
     </div>
 
   </div>
 </div>
 
 <!-- Offline update toast -->
-<div id="updateToast" class="update-toast">
-  <div class="update-toast-text">
-    Yeni versiya mövcuddur — yeniləmək istəyirsən?
-  </div>
+<div id="updateToast" class="update-toast" aria-live="polite">
+  <div class="update-toast-text" id="updateToastText">Yeni versiya mövcuddur — yeniləmək istəyirsən?</div>
   <div class="update-toast-actions">
-    <button id="updateRefreshBtn" class="btn primary small">Refresh</button>
-    <button id="updateDismissBtn" class="btn small">Sonra</button>
+    <button id="updateRefreshBtn" class="btn primary small" type="button">Refresh</button>
+    <button id="updateDismissBtn" class="btn small" type="button">Sonra</button>
   </div>
 </div>
 
-<!-- iOS textarea scroll fix (alt sətirlər kəsilməsin) -->
-<style>
-  #exportText {
-    overflow-y: auto;
-    max-height: 220px;
-  }
-</style>
-
 <script>
+(() => {
+  "use strict";
+
   // ===========================
   // CONSTANTS (LocalStorage)
   // ===========================
   const STORAGE_KEY_STATE = "proTrendV2_state";
-  const STORAGE_KEY_LOG = "proTrendV2_trades";
+  const STORAGE_KEY_LOG   = "proTrendV2_trades";
 
-  // LONG/SHORT mode state
+  const SECTION_MAX = { 1: 8, 2: 4, 3: 6, 4: 2, 5: 1 };
+  const SECTION_NAME = {
+    1: "Futures Impulse",
+    2: "Spot Confirmation",
+    3: "Extra PRO",
+    4: "Market Structure",
+    5: "BTC Regime"
+  };
+
+  // Mode state
   let currentMode = "LONG";
-  const itemTexts = {};
+  const itemTexts = {}; // long base texts
+  let tradeLog = [];
+
   let lastTotals = {
     total: 0,
     secScores: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
     hardFail: false,
     verdict: "Status: No data"
   };
-  let tradeLog = [];
 
-  // SHORT mode üçün spesifik text-lər (yalnız dəyişənlər)
+  // SHORT mode texts (only overrides)
   const shortModeConfig = {
-    1: {
-      title: "1) Taker Buy/Sell Flow (Δ Taker) — SHORT",
-      desc: "Bearish (SHORT): Sell üstün, qırmızı spike, sell > 55–60%.<br>Kritik: Price ↓ amma sell zəif → fake dump / short trap riski."
-    },
-    2: {
-      title: "2) Basis (Futures vs Spot Premium) — SHORT",
-      desc: "Bearish (SHORT): Basis yüngül ↓ və ya mənfi, futures spotdan aşağı.<br>Kritik: Basis kəskin ↑ + Price ↓ → crowded shorts, squeeze riski."
-    },
-    3: {
-      title: "3) OI / Market Cap Ratio — SHORT",
-      desc: "Bearish (SHORT): Ratio ↑ və Price ↓ → leveraged short trend güclüdür.<br>Kritik: Ratio ↓ + Price ↓ → trend yorğun, late short riski."
-    },
-    4: {
-      title: "4) OI Dynamics — 4 Davranış (SHORT)",
-      desc: "SHORT konteksində:<br>↑OI + ↓Price → continuation (SHORT üçün yaxşı)<br>↑OI + ↑Price → short squeeze / trap riski<br>↓OI + ↓Price → son faza, daha çox profit-taking<br>↓OI + ↑Price → squeeze, yeni short üçün çox risklidir."
-    },
-    5: {
-      title: "5) Notional OI — SHORT",
-      desc: "Bearish (SHORT): Notional stabil / yüngül ↑, Price ↓ → short tərəfi aktivdir.<br>Kritik: Notional ↓ + Price ↓ → de-leverage son faza, late short."
-    },
-    6: {
-      title: "6) Top Trader Account Ratio — SHORT",
-      desc: "SHORT: Retail long-heavydirsə, pros short tərəfdə → üstünlük.<br>Kritik: Retail hamısı short → squeeze riski."
-    },
-    7: {
-      title: "7) Top Trader Position Ratio — SHORT",
-      desc: "SHORT: Pros short bias-dadırsa, setup daha etibarlıdır.<br>Əksinədirsə, short üçün ehtiyat."
-    },
-    8: {
-      title: "8) Global Long/Short Ratio — SHORT",
-      desc: "SHORT: Global > 1 (crowded longs) → short üçün rüzgar sənin tərəfindədir.<br>Global < 1 və hamı shortdadırsa → squeeze riski."
-    },
-    9: {
-      title: "BLOCK 1 — Spot Money Flow (SHORT)",
-      desc: "SHORT: Net outflow, sell walls, yuxarıda sell interest → dump davam edə bilər.<br>Against (SHORT üçün): Net inflow + buy walls → short üçün təhlükə."
-    },
-    10: {
-      title: "BLOCK 2 — Spot Volume (SHORT)",
-      desc: "SHORT: Aşağıya doğru impulsda sell volume ↑ davamlı.<br>Kritik: Volume sönürsə, dump gücünü itirir, late short riski."
-    },
-    11: {
-      title: "BLOCK 3 — Spot Orderbook (SHORT)",
-      desc: "SHORT: Yuxarıda ASK walls, sell absorption, hər pump satılır.<br>Against: Aşağıda güclü BID walls → short üçün risk."
-    },
-    12: {
-      title: "BLOCK 4 — Spot Price Action (SHORT)",
-      desc: "SHORT: LH/LF, lower highs/lows → bearish structure, continuation üçün yaxşı.<br>Against: HH/HL → short-a qarşı trend."
-    },
-    14: {
-      title: "2) Liquidation Heatmap (SHORT)",
-      desc: "SHORT: Aşağıda likvidation cluster-lar target kimidir, amma çox yaxınsa immediate bounce riski var.<br>Yuxarıdakı böyük cluster-lar squeeze üçün maqnit ola bilər."
-    },
-    15: {
-      title: "3) VWAP (SHORT)",
-      desc: "SHORT: Price < VWAP və VWAP aşağı meyillidirsə → trend short tərəfdədir.<br>Against: Price > VWAP və hər dəfə üstündə qalırsa → short üçün zəifdir."
-    },
-    17: {
-      title: "5) Funding Curve (SHORT)",
-      desc: "SHORT: Funding çox pozitiv + crowded longs → short üçün advantage.<br>Against: Funding artıq negativ, amma Price hələ də aşağıdırsa → late short riski."
-    },
-    18: {
-      title: "6) Implied Volatility (IV) — SHORT",
-      desc: "SHORT: IV çox yüksək + Price aşağı → qısa müddətlik continuation, amma agressiv squeeze riski də artır.<br>IV düşməyə başlayırsa → artıq de-risking gedir, late short ola bilər."
-    },
-    19: {
-      title: "1) 4H Macro Trend — SHORT",
-      desc: "SHORT: Price EMA 50/200 altında → makro bearish kontekst, short üçün uyğundur.<br>Against: EMA-ların üstündə → short üçün əks trend."
-    },
-    20: {
-      title: "2) Local Structure — SHORT",
-      desc: "SHORT: BOS down, lower lows/highs → continuation üçün yaxşı.<br>BOS up → short-a qarşı local reversal."
-    },
-    21: {
-      title: "BTC Mood (OI, VWAP, Liquidity) — SHORT",
-      desc: "SHORT: BTC OI ↑ + Price ↓, VWAP altında → altcoin SHORT üçün sağlam fon.<br>Against: OI ↑ + Price ↑ → BTC-də squeeze rejimi, NO-TRADE."
-    }
+    1: { title: "1) Taker Buy/Sell Flow (Δ Taker) — SHORT",
+      desc: "Bearish (SHORT): Sell üstün, qırmızı spike, sell > 55–60%.<br>Kritik: Price ↓ amma sell zəif → fake dump / short trap riski." },
+    2: { title: "2) Basis (Futures vs Spot Premium) — SHORT",
+      desc: "Bearish (SHORT): Basis yüngül ↓ və ya mənfi, futures spotdan aşağı.<br>Kritik: Basis kəskin ↑ + Price ↓ → crowded shorts, squeeze riski." },
+    3: { title: "3) OI / Market Cap Ratio — SHORT",
+      desc: "Bearish (SHORT): Ratio ↑ və Price ↓ → leveraged short trend güclüdür.<br>Kritik: Ratio ↓ + Price ↓ → trend yorğun, late short riski." },
+    4: { title: "4) OI Dynamics — 4 Davranış (SHORT)",
+      desc: "SHORT konteksində:<br>↑OI + ↓Price → continuation (SHORT üçün yaxşı)<br>↑OI + ↑Price → short squeeze / trap riski<br>↓OI + ↓Price → son faza, daha çox profit-taking<br>↓OI + ↑Price → squeeze, yeni short üçün çox risklidir." },
+    5: { title: "5) Notional OI — SHORT",
+      desc: "Bearish (SHORT): Notional stabil / yüngül ↑, Price ↓ → short tərəfi aktivdir.<br>Kritik: Notional ↓ + Price ↓ → de-leverage son faza, late short." },
+    6: { title: "6) Top Trader Account Ratio — SHORT",
+      desc: "SHORT: Retail long-heavydirsə, pros short tərəfdə → üstünlük.<br>Kritik: Retail hamısı short → squeeze riski." },
+    7: { title: "7) Top Trader Position Ratio — SHORT",
+      desc: "SHORT: Pros short bias-dadırsa, setup daha etibarlıdır.<br>Əksinədirsə, short üçün ehtiyat." },
+    8: { title: "8) Global Long/Short Ratio — SHORT",
+      desc: "SHORT: Global > 1 (crowded longs) → short üçün rüzgar sənin tərəfindədir.<br>Global < 1 və hamı shortdadırsa → squeeze riski." },
+    9: { title: "BLOCK 1 — Spot Money Flow (SHORT)",
+      desc: "SHORT: Net outflow, sell walls, yuxarıda sell interest → dump davam edə bilər.<br>Against (SHORT üçün): Net inflow + buy walls → short üçün təhlükə." },
+    10:{ title: "BLOCK 2 — Spot Volume (SHORT)",
+      desc: "SHORT: Aşağıya doğru impulsda sell volume ↑ davamlı.<br>Kritik: Volume sönürsə, dump gücünü itirir, late short riski." },
+    11:{ title: "BLOCK 3 — Spot Orderbook (SHORT)",
+      desc: "SHORT: Yuxarıda ASK walls, sell absorption, hər pump satılır.<br>Against: Aşağıda güclü BID walls → short üçün risk." },
+    12:{ title: "BLOCK 4 — Spot Price Action (SHORT)",
+      desc: "SHORT: LH/LF, lower highs/lows → bearish structure, continuation üçün yaxşı.<br>Against: HH/HL → short-a qarşı trend." },
+    14:{ title: "2) Liquidation Heatmap (SHORT)",
+      desc: "SHORT: Aşağıda likvidation cluster-lar target kimidir, amma çox yaxınsa immediate bounce riski var.<br>Yuxarıdakı böyük cluster-lar squeeze üçün maqnit ola bilər." },
+    15:{ title: "3) VWAP (SHORT)",
+      desc: "SHORT: Price < VWAP və VWAP aşağı meyillidirsə → trend short tərəfdədir.<br>Against: Price > VWAP və hər dəfə üstündə qalırsa → short üçün zəifdir." },
+    17:{ title: "5) Funding Curve (SHORT)",
+      desc: "SHORT: Funding çox pozitiv + crowded longs → short üçün advantage.<br>Against: Funding artıq negativ, amma Price hələ də aşağıdırsa → late short riski." },
+    18:{ title: "6) Implied Volatility (IV) — SHORT",
+      desc: "SHORT: IV çox yüksək + Price aşağı → qısa müddətlik continuation, amma agressiv squeeze riski də artır.<br>IV düşməyə başlayırsa → artıq de-risking gedir, late short ola bilər." },
+    19:{ title: "1) 4H Macro Trend — SHORT",
+      desc: "SHORT: Price EMA 50/200 altında → makro bearish kontekst, short üçün uyğundur.<br>Against: EMA-ların üstündə → short üçün əks trend." },
+    20:{ title: "2) Local Structure — SHORT",
+      desc: "SHORT: BOS down, lower lows/highs → continuation üçün yaxşı.<br>BOS up → short-a qarşı local reversal." },
+    21:{ title: "BTC Mood (OI, VWAP, Liquidity) — SHORT",
+      desc: "SHORT: BTC OI ↑ + Price ↓, VWAP altında → altcoin SHORT üçün sağlam fon.<br>Against: OI ↑ + Price ↑ → BTC-də squeeze rejimi, NO-TRADE." }
   };
 
-  // SECTION HEADER COLLAPSE
-  document.querySelectorAll(".section-header").forEach((h) => {
-    h.addEventListener("click", (e) => {
-      if (e.target.closest("button")) return;
-      const sec = h.closest(".section");
-      if (!sec) return;
-      sec.classList.toggle("collapsed");
-    });
-  });
+  // ===========================
+  // DOM
+  // ===========================
+  const $ = (id) => document.getElementById(id);
 
-  // Default: yalnız Bölmə 1 açıq, qalanları collapsed
-  document.querySelectorAll(".section[data-section]").forEach((sec) => {
-    const id = parseInt(sec.dataset.section || "0", 10);
-    if (id > 1) sec.classList.add("collapsed");
-  });
+  const sectionsRoot = $("sectionsRoot");
+  const overallScoreEl = $("overallScore");
+  const finalScoreTextEl = $("finalScoreText");
+  const finalVerdictEl = $("finalVerdict");
+  const finalCommentEl = $("finalComment");
+  const hfStatusEl = $("hfStatus");
+  const exportTextEl = $("exportText");
 
+  const btnResetAll = $("btnResetAll");
+  const btnCopyExport = $("btnCopyExport");
+  const btnSaveTrade = $("btnSaveTrade");
+  const btnExportJson = $("btnExportJson");
+  const btnImportJson = $("btnImportJson");
+  const btnCompareSessions = $("btnCompareSessions");
+
+  const modeLongBtn = $("modeLong");
+  const modeShortBtn = $("modeShort");
+
+  // Update toast
+  const updateToast = $("updateToast");
+  const updateRefreshBtn = $("updateRefreshBtn");
+  const updateDismissBtn = $("updateDismissBtn");
+  let waitingSW = null;
+
+  // ===========================
+  // Helpers
+  // ===========================
+  function sectionMax(id) { return SECTION_MAX[id] || 0; }
+
+  function buildVerdict(total, hardFail) {
+    if (hardFail) {
+      return {
+        verdict: "❌ HARD-FAIL — NO TRADE",
+        comment: "BTC və ya OI Dynamics ciddi əleyhdədir. Score yüksək olsa belə TREYD ETMƏ. Trap riskini qəbul etmə."
+      };
+    }
+    if (total >= 13) {
+      return {
+        verdict: "✅ HIGH CONVICTION — PRO Entry",
+        comment: "Futures + Spot + Extra PRO + Struktur + BTC hamısı sənin tərəfindədir. Planlı risklə PRO ölçüdə entry mümkündür."
+      };
+    }
+    if (total >= 7) {
+      return {
+        verdict: "🟢 STRONG / OK Setup",
+        comment: "Əsas bloklar alignment verir. Normal ölçüdə trade edilə bilər, zəif blokları risk hesablamasında nəzərə al."
+      };
+    }
+    if (total >= 3) {
+      return {
+        verdict: "🟡 MIXED — Small Size / Scout",
+        comment: "Bəzi bloklar yaxşı, bəziləri əleyhinədir. Bu daha çox scout-size və praktik müşahidə treydi üçündür."
+      };
+    }
+    if (total >= 0) {
+      return {
+        verdict: "🟧 WEAK — NO-TRADE Zone",
+        comment: "Alignment çox zəifdir. Daha təmiz impuls və daha güclü təsdiq üçün səbr etmək uzun müddətdə daha sərfəlidir."
+      };
+    }
+    return {
+      verdict: "🔴 CONTRARIAN ONLY",
+      comment: "Ümumi skor mənfidir. Bu yalnız çox təcrübəli kontrarian scalp üçün məntiqlidir, normal treyd üçün uyğun deyil."
+    };
+  }
+
+  function buildExport(secScores, total, verdict, hardFail) {
+    let text = "";
+    text += "📌 PRO Trend Verification — FULL MODE V2.1\n";
+    text += `Mode: ${currentMode}\n`;
+    text += "----------------------------------------\n";
+    text += `🟦 Futures Impulse: ${secScores[1]} / 8\n`;
+    text += `🟩 Spot Confirmation: ${secScores[2]} / 4\n`;
+    text += `🟪 Extra PRO: ${secScores[3]} / 6\n`;
+    text += `🟥 Market Structure: ${secScores[4]} / 2\n`;
+    text += `🟧 BTC Regime: ${secScores[5]} / 1\n\n`;
+    text += `📊 Overall Score: ${total} / 21\n`;
+    text += `⚙️ Hard-Fail: ${hardFail ? "VAR (NO-TRADE)" : "Yox"}\n`;
+    text += `🧾 Verdict: ${verdict}\n`;
+    exportTextEl.value = text;
+  }
+
+  function formatTimestamp(ts) {
+    try {
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      return `${y}-${m}-${day} ${hh}:${mm}`;
+    } catch (e) {
+      return String(ts || "");
+    }
+  }
+
+  // ===========================
+  // Mode text system
+  // ===========================
   function initModeTexts() {
     document.querySelectorAll(".item").forEach((item) => {
       const id = item.dataset.id;
@@ -1097,10 +1098,7 @@
       const dEl = item.querySelector(".item-desc");
       if (!tEl || !dEl) return;
       if (!itemTexts[id]) {
-        itemTexts[id] = {
-          titleLong: tEl.innerHTML,
-          descLong: dEl.innerHTML
-        };
+        itemTexts[id] = { titleLong: tEl.innerHTML, descLong: dEl.innerHTML };
       }
     });
   }
@@ -1115,10 +1113,7 @@
 
       const base = itemTexts[id];
       if (currentMode === "LONG") {
-        if (base) {
-          tEl.innerHTML = base.titleLong;
-          dEl.innerHTML = base.descLong;
-        }
+        if (base) { tEl.innerHTML = base.titleLong; dEl.innerHTML = base.descLong; }
       } else {
         const cfg = shortModeConfig[id] || {};
         tEl.innerHTML = cfg.title || (base && base.titleLong) || tEl.innerHTML;
@@ -1128,133 +1123,111 @@
   }
 
   function setMode(mode) {
-    currentMode = mode;
-    const btnLong = document.getElementById("modeLong");
-    const btnShort = document.getElementById("modeShort");
-    if (btnLong) btnLong.classList.toggle("active-mode", mode === "LONG");
-    if (btnShort) btnShort.classList.toggle("active-mode", mode === "SHORT");
+    currentMode = (mode === "SHORT") ? "SHORT" : "LONG";
+    modeLongBtn.classList.toggle("active-mode", currentMode === "LONG");
+    modeShortBtn.classList.toggle("active-mode", currentMode === "SHORT");
     applyModeToItems();
     recompute();
+    saveStateToStorage();
   }
 
-  // Hər item üçün score yaz
-  function setScore(btn, score) {
-    const item = btn.closest(".item");
-    if (!item) return;
+  // ===========================
+  // Scoring logic (delegated)
+  // ===========================
+  function setScoreForItem(itemEl, score) {
+    if (!itemEl) return;
+    itemEl.dataset.score = String(score);
 
-    item.dataset.score = score;
+    const buttons = itemEl.querySelectorAll(".item-btn");
+    buttons.forEach((b) => b.classList.remove("active-support", "active-neutral", "active-against"));
 
-    const all = item.querySelectorAll(".item-btn");
-    all.forEach((b) =>
-      b.classList.remove("active-support", "active-neutral", "active-against")
-    );
-
-    if (score === 1) btn.classList.add("active-support");
-    else if (score === 0) btn.classList.add("active-neutral");
-    else if (score === -1) btn.classList.add("active-against");
+    // which button pressed? we match by data-score
+    const pressed = itemEl.querySelector(`.item-btn[data-score="${score}"]`);
+    if (score === 1 && pressed) pressed.classList.add("active-support");
+    else if (score === 0 && pressed) pressed.classList.add("active-neutral");
+    else if (score === -1 && pressed) pressed.classList.add("active-against");
 
     recompute();
+    saveStateToStorage();
   }
 
-  // Bölmə maksimum xalı
-  function sectionMax(id) {
-    const map = { 1: 8, 2: 4, 3: 6, 4: 2, 5: 1 };
-    return map[id] || 0;
-  }
+  function recompute() {
+    const secScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let total = 0;
+    let hardFail = false;
 
-  // Verdict mətni
-  function buildVerdict(total, hardFail) {
-    if (hardFail) {
-      return {
-        verdict: "❌ HARD-FAIL — NO TRADE",
-        comment:
-          "BTC və ya OI Dynamics ciddi əleyhdədir. Score yüksək olsa belə TREYD ETMƏ. Trap riskini qəbul etmə."
-      };
+    // Sum per section
+    document.querySelectorAll(".section[data-section]").forEach((sec) => {
+      const sid = parseInt(sec.dataset.section || "0", 10);
+      if (!sid) return;
+
+      let sum = 0;
+      sec.querySelectorAll(".item").forEach((item) => {
+        const s = parseInt(item.dataset.score || "0", 10);
+        sum += s;
+
+        // Hardfail triggers only if marked hardfail AND score is -1
+        if (item.dataset.hardfail === "true" && s === -1) hardFail = true;
+      });
+
+      const max = sectionMax(sid);
+      // Clamp: negative values don't reduce section score below 0 for display,
+      // BUT they DO affect total logic? In your original logic total was overall alignment:
+      // We'll keep total as sum of clamped positives to match your "0..21" scoreboard.
+      const clamped = Math.max(0, Math.min(max, sum));
+      secScores[sid] = clamped;
+    });
+
+    total = secScores[1] + secScores[2] + secScores[3] + secScores[4] + secScores[5];
+
+    // Update section score UI
+    for (let i = 1; i <= 5; i++) {
+      const el = $("score-sec-" + i);
+      if (el) el.textContent = `${secScores[i]} / ${SECTION_MAX[i]}`;
     }
 
-    if (total >= 13) {
-      return {
-        verdict: "✅ HIGH CONVICTION — PRO Entry",
-        comment:
-          "Futures + Spot + Extra PRO + Struktur + BTC hamısı sənin tərəfindədir. Planlı risklə PRO ölçüdə entry mümkündür."
-      };
-    }
+    // Verdict
+    const v = buildVerdict(total, hardFail);
 
-    if (total >= 7) {
-      return {
-        verdict: "🟢 STRONG / OK Setup",
-        comment:
-          "Əsas bloklar alignment verir. Normal ölçüdə trade edilə bilər, zəif blokları risk hesablamasında nəzərə al."
-      };
-    }
-
-    if (total >= 3) {
-      return {
-        verdict: "🟡 MIXED — Small Size / Scout",
-        comment:
-          "Bəzi bloklar yaxşı, bəziləri əleyhinədir. Bu daha çox scout-size və praktik müşahidə treydi üçündür."
-      };
-    }
-
-    if (total >= 0) {
-      return {
-        verdict: "🟧 WEAK — NO-TRADE Zone",
-        comment:
-          "Alignment çox zəifdir. Daha təmiz impuls və daha güclü təsdiq üçün səbr etmək uzun müddətdə daha sərfəlidir."
-      };
-    }
-
-    return {
-      verdict: "🔴 CONTRARIAN ONLY",
-      comment:
-        "Ümumi skor mənfidir. Bu yalnız çox təcrübəli kontrarian scalp üçün məntiqlidir, normal treyd üçün uyğun deyil."
+    lastTotals = {
+      total,
+      secScores: { ...secScores },
+      hardFail,
+      verdict: v.verdict
     };
+
+    // Update UI
+    overallScoreEl.textContent = String(total);
+    finalScoreTextEl.textContent = `${total} / 21`;
+    finalVerdictEl.textContent = v.verdict;
+    finalCommentEl.textContent = v.comment;
+
+    hfStatusEl.textContent = `Hard-Fail: ${hardFail ? "VAR (NO-TRADE)" : "Yox"}`;
+    hfStatusEl.classList.toggle("hf-ok", !hardFail);
+    hfStatusEl.classList.toggle("hf-bad", hardFail);
+
+    // Export
+    buildExport(secScores, total, v.verdict, hardFail);
   }
 
-  // Export mətni (Telegram üçün)
-  function buildExport(secScores, total, verdict, hardFail) {
-    let text = "";
-    text += "📌 PRO Trend Verification — FULL MODE V2\n";
-    text += `Mode: ${currentMode}\n`;
-    text += "----------------------------------------\n";
-    text += `🟦 Futures Impulse: ${secScores[1]} / 8\n`;
-    text += `🟩 Spot Confirmation: ${secScores[2]} / 4\n`;
-    text += `🟪 Extra PRO: ${secScores[3]} / 6\n`;
-    text += `🟥 Market Structure: ${secScores[4]} / 2\n`;
-    text += `🟧 BTC Regime: ${secScores[5]} / 1\n\n`;
-    text += `📊 Overall Score: ${total} / 21\n`;
-    text += `⚙️ Hard-Fail: ${hardFail ? "VAR (NO-TRADE)" : "Yox"}\n`;
-    text += `🧾 Verdict: ${verdict}\n`;
-
-    const ta = document.getElementById("exportText");
-    if (ta) ta.value = text;
-  }
-
-  // LocalStorage — state save
+  // ===========================
+  // LocalStorage state
+  // ===========================
   function saveStateToStorage() {
     try {
-      if (!window.localStorage) return;
       const scores = {};
       document.querySelectorAll(".item").forEach((item) => {
         const id = item.dataset.id;
         if (!id) return;
-        const s = parseInt(item.dataset.score || "0", 10);
-        scores[id] = s;
+        scores[id] = parseInt(item.dataset.score || "0", 10);
       });
-      const state = {
-        version: 1,
-        mode: currentMode,
-        scores
-      };
-      localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(state));
-    } catch (e) {
-      // localStorage disable olsa, sadəcə ignore
-    }
+      const payload = { version: 1, mode: currentMode, scores };
+      localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(payload));
+    } catch (e) {}
   }
 
   function loadStateFromStorage() {
     try {
-      if (!window.localStorage) return null;
       const raw = localStorage.getItem(STORAGE_KEY_STATE);
       if (!raw) return null;
       return JSON.parse(raw);
@@ -1269,41 +1242,62 @@
       const id = item.dataset.id;
       if (!id) return;
       if (!(id in scores)) return;
+
       const s = parseInt(scores[id], 10);
-      item.dataset.score = s;
+      item.dataset.score = String(s);
 
       const buttons = item.querySelectorAll(".item-btn");
-      buttons.forEach((b) =>
-        b.classList.remove("active-support", "active-neutral", "active-against")
-      );
-      if (s === 1) {
-        const btn = buttons[0];
-        if (btn) btn.classList.add("active-support");
-      } else if (s === 0) {
-        const btn = buttons[1];
-        if (btn) btn.classList.add("active-neutral");
-      } else if (s === -1) {
-        const btn = buttons[2];
-        if (btn) btn.classList.add("active-against");
-      }
+      buttons.forEach((b) => b.classList.remove("active-support", "active-neutral", "active-against"));
+
+      const pressed = item.querySelector(`.item-btn[data-score="${s}"]`);
+      if (s === 1 && pressed) pressed.classList.add("active-support");
+      else if (s === 0 && pressed) pressed.classList.add("active-neutral");
+      else if (s === -1 && pressed) pressed.classList.add("active-against");
     });
   }
 
-  // Trade log — LocalStorage
+  // ===========================
+  // Reset & Copy
+  // ===========================
+  function resetAll() {
+    document.querySelectorAll(".item").forEach((item) => {
+      delete item.dataset.score;
+      const buttons = item.querySelectorAll(".item-btn");
+      buttons.forEach((b) => b.classList.remove("active-support", "active-neutral", "active-against"));
+    });
+    recompute();
+    saveStateToStorage();
+  }
+
+  async function copyExport() {
+    try {
+      const txt = exportTextEl.value || "";
+      if (!txt.trim()) { alert("Export boşdur."); return; }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(txt);
+      } else {
+        exportTextEl.focus();
+        exportTextEl.select();
+        document.execCommand("copy");
+      }
+      alert("Export kopyalandı ✔");
+    } catch (e) {
+      alert("Copy alınmadı. (iOS/PWA icazə məhdudiyyəti ola bilər)");
+    }
+  }
+
+  // ===========================
+  // Trade log
+  // ===========================
+  function saveTradeLogToStorage() {
+    try { localStorage.setItem(STORAGE_KEY_LOG, JSON.stringify(tradeLog)); } catch (e) {}
+  }
+
   function loadTradeLog() {
     try {
-      if (!window.localStorage) {
-        tradeLog = [];
-        renderTradeLog();
-        updateSessionSelectors();
-        return;
-      }
       const raw = localStorage.getItem(STORAGE_KEY_LOG);
-      if (!raw) {
-        tradeLog = [];
-      } else {
-        tradeLog = JSON.parse(raw) || [];
-      }
+      tradeLog = raw ? (JSON.parse(raw) || []) : [];
     } catch (e) {
       tradeLog = [];
     }
@@ -1311,78 +1305,35 @@
     updateSessionSelectors();
   }
 
-  function saveTradeLogToStorage() {
-    try {
-      if (!window.localStorage) return;
-      localStorage.setItem(STORAGE_KEY_LOG, JSON.stringify(tradeLog));
-    } catch (e) {
-      // ignore
-    }
-  }
-
-  function formatTimestamp(ts) {
-    try {
-      const d = new Date(ts);
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, "0");
-      const day = String(d.getDate()).padStart(2, "0");
-      const hh = String(d.getHours()).padStart(2, "0");
-      const mm = String(d.getMinutes()).padStart(2, "0");
-      return `${y}-${m}-${day} ${hh}:${mm}`;
-    } catch (e) {
-      return ts;
-    }
-  }
-
   function renderTradeLog() {
-    const box = document.getElementById("tradeLogList");
+    const box = $("tradeLogList");
     if (!box) return;
+
     if (!tradeLog || tradeLog.length === 0) {
       box.innerHTML = '<div style="color: var(--muted); font-size:0.68rem;">Hələ heç bir trade log edilməyib.</div>';
       return;
     }
 
     let html = "";
-    tradeLog
-      .slice()
-      .reverse()
-      .forEach((entry) => {
-        html += `<div class="trade-log-entry">
-          <div class="trade-log-entry-header">
-            [${formatTimestamp(entry.ts)}] ${entry.symbol || "N/A"} ${entry.tf ? "(" + entry.tf + ")" : ""}
-
-          </div>
-          <div class="trade-log-entry-meta">
-            Mode: ${entry.mode} — Score: ${entry.totalScore} / 21, Hard-Fail: ${entry.hardFail ? "VAR" : "Yox"}
-          </div>
-          <div class="trade-log-entry-meta">
-            Verdict: ${entry.verdict}
-          </div>
-        </div>`;
-      });
+    tradeLog.slice().reverse().forEach((entry) => {
+      html += `<div class="trade-log-entry">
+        <div class="trade-log-entry-header">[${formatTimestamp(entry.ts)}] ${entry.symbol || "N/A"} ${entry.tf ? "(" + entry.tf + ")" : ""}</div>
+        <div class="trade-log-entry-meta">Mode: ${entry.mode} — Score: ${entry.totalScore} / 21, Hard-Fail: ${entry.hardFail ? "VAR" : "Yox"}</div>
+        <div class="trade-log-entry-meta">Verdict: ${entry.verdict || "-"}</div>
+      </div>`;
+    });
 
     box.innerHTML = html;
   }
 
   function saveTradeLog() {
-    const symbolInput = document.getElementById("logSymbol");
-    const tfInput = document.getElementById("logTF");
+    const symbol = ($("logSymbol").value || "").trim();
+    const tf = ($("logTF").value || "").trim();
 
-    const symbol = symbolInput ? symbolInput.value.trim() : "";
-    const tf = tfInput ? tfInput.value.trim() : "";
+    if (!symbol) { alert("Trade log üçün ən azı pair (məs: BTCUSDT) yaz."); return; }
 
-    // Heç olmasa pair yazılmalıdır ki, log mənalı olsun
-    if (!symbol) {
-      alert("Trade log üçün ən azı pair (məs: BTCUSDT) yaz.");
-      return;
-    }
-
-    // Heç bir item işarə olunmayıbsa, xəbərdarlıq
     const anyScored = !!document.querySelector(".item[data-score]");
-    if (!anyScored) {
-      alert("Əvvəlcə checklist-dən ən azı bir neçə punkt işarələ, sonra log et.");
-      return;
-    }
+    if (!anyScored) { alert("Əvvəlcə checklist-dən ən azı bir neçə punkt işarələ, sonra log et."); return; }
 
     const entry = {
       ts: new Date().toISOString(),
@@ -1396,26 +1347,25 @@
     };
 
     tradeLog.push(entry);
-    if (tradeLog.length > 200) {
-      tradeLog = tradeLog.slice(tradeLog.length - 200);
-    }
+    if (tradeLog.length > 200) tradeLog = tradeLog.slice(tradeLog.length - 200);
 
     saveTradeLogToStorage();
     renderTradeLog();
     updateSessionSelectors();
 
-    if (tfInput) tfInput.value = "";
+    $("logTF").value = "";
   }
 
-  // JSON EXPORT — bütün state + trade log
+  // ===========================
+  // JSON export/import
+  // ===========================
   function exportJournalJson() {
     try {
       const scores = {};
       document.querySelectorAll(".item").forEach((item) => {
         const id = item.dataset.id;
         if (!id) return;
-        const s = parseInt(item.dataset.score || "0", 10);
-        scores[id] = s;
+        scores[id] = parseInt(item.dataset.score || "0", 10);
       });
 
       const payload = {
@@ -1428,11 +1378,10 @@
       };
 
       const json = JSON.stringify(payload, null, 2);
-
       const blob = new Blob([json], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
 
+      const a = document.createElement("a");
       const now = new Date();
       const y = now.getFullYear();
       const m = String(now.getMonth() + 1).padStart(2, "0");
@@ -1445,17 +1394,16 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
 
+      URL.revokeObjectURL(url);
       alert("Journal JSON formatında export olundu ✔");
     } catch (e) {
       alert("Export zamanı xəta baş verdi.");
     }
   }
 
-  // JSON IMPORT — fayldan bütün state + trade log oxu
   function importJournalJson() {
-    const fileInput = document.getElementById("importFile");
+    const fileInput = $("importFile");
     if (!fileInput) return;
 
     fileInput.value = "";
@@ -1466,32 +1414,21 @@
       const reader = new FileReader();
       reader.onload = (ev) => {
         try {
-          const text = ev.target.result;
-          const data = JSON.parse(text);
+          const data = JSON.parse(ev.target.result);
+          if (!data || typeof data !== "object") throw new Error("Bad JSON");
 
-          if (!data || typeof data !== "object") {
-            throw new Error("Empty");
-          }
+          if (data.mode === "SHORT" || data.mode === "LONG") setMode(data.mode);
+          if (data.scores && typeof data.scores === "object") applySavedScores(data.scores);
 
-          // Mode
-          if (data.mode === "SHORT" || data.mode === "LONG") {
-            setMode(data.mode);
-          }
-
-          // Scores
-          if (data.scores && typeof data.scores === "object") {
-            applySavedScores(data.scores);
-          }
-
-          // Trade log
           if (Array.isArray(data.tradeLog)) {
             tradeLog = data.tradeLog;
             saveTradeLogToStorage();
-            renderTradeLog();
-            updateSessionSelectors();
           }
 
-          recompute(); // totals + localStorage yenilə
+          recompute();
+          saveStateToStorage();
+          renderTradeLog();
+          updateSessionSelectors();
 
           alert("Journal JSON-dan uğurla import olundu ✔");
         } catch (err) {
@@ -1505,11 +1442,14 @@
     fileInput.click();
   }
 
-  // SESSION COMPARISON TOOL (V2.1)
+  // ===========================
+  // Session comparison (V2.1)
+  // ===========================
   function updateSessionSelectors() {
-    const selA = document.getElementById("sessionA");
-    const selB = document.getElementById("sessionB");
-    if (!selA || !selB) return;
+    const selA = $("sessionA");
+    const selB = $("sessionB");
+    const resBox = $("sessionCompareResult");
+    if (!selA || !selB || !resBox) return;
 
     selA.innerHTML = "";
     selB.innerHTML = "";
@@ -1522,11 +1462,7 @@
       selB.appendChild(opt);
       selA.disabled = true;
       selB.disabled = true;
-
-      const resBox = document.getElementById("sessionCompareResult");
-      if (resBox) {
-        resBox.innerHTML = '<div style="color: var(--muted); font-size:0.68rem;">Müqayisə üçün əvvəlcə ən azı 2 trade log et.</div>';
-      }
+      resBox.innerHTML = '<div style="color: var(--muted); font-size:0.68rem;">Müqayisə üçün əvvəlcə ən azı 2 trade log et.</div>';
       return;
     }
 
@@ -1534,11 +1470,7 @@
     selB.disabled = false;
 
     tradeLog.forEach((entry, idx) => {
-      const label =
-        `[${formatTimestamp(entry.ts)}] ` +
-        `${entry.symbol || "N/A"} ` +
-        `${entry.tf ? "(" + entry.tf + ")" : ""} — ` +
-        `${entry.mode} ${entry.totalScore != null ? " | " + entry.totalScore + "/21" : ""}`;
+      const label = `[${formatTimestamp(entry.ts)}] ${entry.symbol || "N/A"} ${entry.tf ? "(" + entry.tf + ")" : ""} — ${entry.mode} ${entry.totalScore != null ? " | " + entry.totalScore + "/21" : ""}`;
 
       const optA = document.createElement("option");
       optA.value = String(idx);
@@ -1552,7 +1484,6 @@
       selB.appendChild(optB);
     });
 
-    // Default: son 2 sessiya
     const n = tradeLog.length;
     if (n >= 1) selB.value = String(n - 1);
     if (n >= 2) selA.value = String(n - 2);
@@ -1560,27 +1491,18 @@
   }
 
   function compareSessions() {
-    const selA = document.getElementById("sessionA");
-    const selB = document.getElementById("sessionB");
-    const resBox = document.getElementById("sessionCompareResult");
-
+    const selA = $("sessionA");
+    const selB = $("sessionB");
+    const resBox = $("sessionCompareResult");
     if (!selA || !selB || !resBox) return;
 
     const idxA = parseInt(selA.value || "-1", 10);
     const idxB = parseInt(selB.value || "-1", 10);
 
-    if (
-      isNaN(idxA) ||
-      isNaN(idxB) ||
-      idxA < 0 ||
-      idxB < 0 ||
-      idxA >= tradeLog.length ||
-      idxB >= tradeLog.length
-    ) {
+    if (isNaN(idxA) || isNaN(idxB) || idxA < 0 || idxB < 0 || idxA >= tradeLog.length || idxB >= tradeLog.length) {
       alert("Müqayisə üçün 2 keçərli sessiya seç.");
       return;
     }
-
     if (idxA === idxB) {
       alert("Eyni sessiyanı öz-özü ilə müqayisə etmək məna vermir, fərqli 2 sessiya seç.");
       return;
@@ -1589,15 +1511,6 @@
     const A = tradeLog[idxA];
     const B = tradeLog[idxB];
 
-    const secNames = {
-      1: "Futures Impulse",
-      2: "Spot Confirmation",
-      3: "Extra PRO",
-      4: "Market Structure",
-      5: "BTC Regime"
-    };
-    const secMax = { 1: 8, 2: 4, 3: 6, 4: 2, 5: 1 };
-
     const scoresA = A.secScores || {};
     const scoresB = B.secScores || {};
 
@@ -1605,54 +1518,207 @@
 
     html += `<div class="trade-log-entry">
       <div class="trade-log-entry-header">Session A</div>
-      <div class="trade-log-entry-meta">
-        [${formatTimestamp(A.ts)}] ${A.symbol || "N/A"} ${A.tf ? "(" + A.tf + ")" : ""} — Mode: ${A.mode}
-      </div>
-      <div class="trade-log-entry-meta">
-        Score: ${A.totalScore != null ? A.totalScore : "0"} / 21, Hard-Fail: ${A.hardFail ? "VAR" : "Yox"}
-      </div>
-      <div class="trade-log-entry-meta">
-        Verdict: ${A.verdict || "-"}
-      </div>
+      <div class="trade-log-entry-meta">[${formatTimestamp(A.ts)}] ${A.symbol || "N/A"} ${A.tf ? "(" + A.tf + ")" : ""} — Mode: ${A.mode}</div>
+      <div class="trade-log-entry-meta">Score: ${A.totalScore ?? 0} / 21, Hard-Fail: ${A.hardFail ? "VAR" : "Yox"}</div>
+      <div class="trade-log-entry-meta">Verdict: ${A.verdict || "-"}</div>
     </div>`;
 
     html += `<div class="trade-log-entry">
       <div class="trade-log-entry-header">Session B</div>
-      <div class="trade-log-entry-meta">
-        [${formatTimestamp(B.ts)}] ${B.symbol || "N/A"} ${B.tf ? "(" + B.tf + ")" : ""} — Mode: ${B.mode}
-      </div>
-      <div class="trade-log-entry-meta">
-        Score: ${B.totalScore != null ? B.totalScore : "0"} / 21, Hard-Fail: ${B.hardFail ? "VAR" : "Yox"}
-      </div>
-      <div class="trade-log-entry-meta">
-        Verdict: ${B.verdict || "-"}
-      </div>
+      <div class="trade-log-entry-meta">[${formatTimestamp(B.ts)}] ${B.symbol || "N/A"} ${B.tf ? "(" + B.tf + ")" : ""} — Mode: ${B.mode}</div>
+      <div class="trade-log-entry-meta">Score: ${B.totalScore ?? 0} / 21, Hard-Fail: ${B.hardFail ? "VAR" : "Yox"}</div>
+      <div class="trade-log-entry-meta">Verdict: ${B.verdict || "-"}</div>
     </div>`;
 
-    html += `<div class="trade-log-entry">
-      <div class="trade-log-entry-header">Section-by-Section Comparison</div>
-    `;
-
-    let maxDiff = -1;
+    // per section comparison
+    let maxAbsDiff = -1;
     let maxDiffSec = null;
-    let maxDiffStr = "";
+
     let consistencySum = 0;
     let consistencyCount = 0;
+
+    html += `<div class="trade-log-entry">
+      <div class="trade-log-entry-header">Section-by-Section</div>`;
 
     for (let i = 1; i <= 5; i++) {
       const sa = parseInt(scoresA[i] || 0, 10);
       const sb = parseInt(scoresB[i] || 0, 10);
       const diff = sb - sa;
       const absDiff = Math.abs(diff);
-      const maxVal = secMax[i] || 1;
-      const consistency = Math.max(0, 1 - absDiff / maxVal);
+      const maxVal = SECTION_MAX[i] || 1;
 
+      const consistency = Math.max(0, 1 - absDiff / maxVal);
       consistencySum += consistency;
       consistencyCount++;
 
-      if (absDiff > maxDiff) {
-        maxDiff = absDiff;
+      if (absDiff > maxAbsDiff) {
+        maxAbsDiff = absDiff;
         maxDiffSec = i;
-        maxDiffStr =
-          `${secNames[i]} — A: ${sa}, B: ${sb}, fərq: ${diff > 0 ? "+" + diff : diff}`;
       }
+
+      html += `<div class="trade-log-entry-meta">
+        • ${SECTION_NAME[i]}: A ${sa}/${maxVal} → B ${sb}/${maxVal} (Δ ${diff > 0 ? "+" + diff : diff})
+      </div>`;
+    }
+
+    const consistencyPct = consistencyCount ? Math.round((consistencySum / consistencyCount) * 100) : 0;
+    const focus = maxDiffSec ? `${SECTION_NAME[maxDiffSec]} (ən böyük fərq)` : "-";
+
+    html += `<div class="trade-log-entry-meta" style="margin-top:6px;">
+      Consistency: <span style="color: var(--accent); font-weight:700;">${consistencyPct}%</span><br>
+      Focus: <span style="color: var(--accent); font-weight:700;">${focus}</span>
+    </div>`;
+    html += `</div>`;
+
+    resBox.innerHTML = html;
+  }
+
+  // ===========================
+  // Section collapse (safe)
+  // ===========================
+  function initCollapse() {
+    document.querySelectorAll(".section-header").forEach((h) => {
+      h.addEventListener("click", (e) => {
+        // button klikində collapse etmə
+        if (e.target.closest("button")) return;
+        const sec = h.closest(".section");
+        if (!sec) return;
+        sec.classList.toggle("collapsed");
+      }, { passive: true });
+    });
+
+    // Default: only Section 1 open
+    document.querySelectorAll(".section[data-section]").forEach((sec) => {
+      const id = parseInt(sec.dataset.section || "0", 10);
+      if (id > 1) sec.classList.add("collapsed");
+    });
+  }
+
+  // ===========================
+  // Delegated tap/click handler (iOS 26 stable)
+  // ===========================
+  function initDelegatedButtons() {
+    const handler = (e) => {
+      const btn = e.target.closest(".item-btn");
+      if (!btn) return;
+      const item = btn.closest(".item");
+      if (!item) return;
+      const score = parseInt(btn.dataset.score || "0", 10);
+      setScoreForItem(item, score);
+    };
+
+    // pointerup primary
+    sectionsRoot.addEventListener("pointerup", handler, { passive: true });
+    // click fallback (desktop / older)
+    sectionsRoot.addEventListener("click", handler, { passive: true });
+  }
+
+  // ===========================
+  // Service worker update toast
+  // ===========================
+  function showUpdateToast() {
+    if (!updateToast) return;
+    updateToast.style.display = "flex";
+  }
+  function hideUpdateToast() {
+    if (!updateToast) return;
+    updateToast.style.display = "none";
+  }
+
+  async function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return;
+
+    try {
+      const reg = await navigator.serviceWorker.register("./service-worker.js", { scope: "./" });
+
+      // If already waiting (rare)
+      if (reg.waiting) {
+        waitingSW = reg.waiting;
+        showUpdateToast();
+      }
+
+      reg.addEventListener("updatefound", () => {
+        const newWorker = reg.installing;
+        if (!newWorker) return;
+
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "installed") {
+            // If there is a controller, it means update available
+            if (navigator.serviceWorker.controller) {
+              waitingSW = reg.waiting || newWorker;
+              showUpdateToast();
+            }
+          }
+        });
+      });
+
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
+        // New SW activated => reload
+        window.location.reload();
+      });
+    } catch (e) {
+      // SW register fail: ignore
+    }
+  }
+
+  function wireTopButtons() {
+    btnResetAll.addEventListener("click", resetAll);
+    btnCopyExport.addEventListener("click", copyExport);
+
+    modeLongBtn.addEventListener("click", () => setMode("LONG"));
+    modeShortBtn.addEventListener("click", () => setMode("SHORT"));
+
+    btnSaveTrade.addEventListener("click", saveTradeLog);
+    btnExportJson.addEventListener("click", exportJournalJson);
+    btnImportJson.addEventListener("click", importJournalJson);
+    btnCompareSessions.addEventListener("click", compareSessions);
+
+    updateRefreshBtn.addEventListener("click", () => {
+      try {
+        if (waitingSW) waitingSW.postMessage({ type: "SKIP_WAITING" });
+      } catch (e) {}
+      hideUpdateToast();
+    });
+
+    updateDismissBtn.addEventListener("click", () => hideUpdateToast());
+  }
+
+  // ===========================
+  // Boot
+  // ===========================
+  function boot() {
+    initCollapse();
+    initModeTexts();
+    initDelegatedButtons();
+    wireTopButtons();
+
+    // Load saved state
+    const state = loadStateFromStorage();
+    if (state && (state.mode === "LONG" || state.mode === "SHORT")) {
+      currentMode = state.mode;
+    }
+    applyModeToItems();
+
+    if (state && state.scores) applySavedScores(state.scores);
+
+    // Load log
+    loadTradeLog();
+
+    // Mode UI
+    modeLongBtn.classList.toggle("active-mode", currentMode === "LONG");
+    modeShortBtn.classList.toggle("active-mode", currentMode === "SHORT");
+
+    recompute();
+    registerServiceWorker();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, { once: true });
+  } else {
+    boot();
+  }
+
+})();
+</script>
+</body>
+</html>
