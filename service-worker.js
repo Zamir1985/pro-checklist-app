@@ -1,6 +1,6 @@
 /* =========================
 FILE: service-worker.js
-iOS 26 / GitHub Pages PRO-FINAL
+iOS 26 / GitHub Pages PRO-FINAL (Stable)
 ========================= */
 
 const CACHE_NAME = "pro-trend-cache-v6";
@@ -11,12 +11,11 @@ const CORE_ASSETS = [
   "./pro_icon.png"
 ];
 
-// Install: cache core + be ready
+// Install: cache core (NO skipWaiting here)
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS))
   );
-  self.skipWaiting();
 });
 
 // Activate: cleanup old caches
@@ -44,10 +43,10 @@ self.addEventListener("fetch", (event) => {
       try {
         const fresh = await fetch(req);
         const cache = await caches.open(CACHE_NAME);
-        cache.put("./index.html", fresh.clone());
+        cache.put(req, fresh.clone());
         return fresh;
       } catch {
-        return caches.match("./index.html");
+        return caches.match(req) || caches.match("./index.html");
       }
     })());
     return;
@@ -69,7 +68,7 @@ self.addEventListener("fetch", (event) => {
   })());
 });
 
-// Controlled update (from UI)
+// Controlled update
 self.addEventListener("message", (event) => {
   if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
