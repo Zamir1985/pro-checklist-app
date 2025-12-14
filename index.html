@@ -57,7 +57,6 @@ FILE: index.html
       -webkit-text-size-adjust: 100%;
     }
 
-    /* iOS: input/textarea seçimi normal qalsın */
     input, textarea {
       -webkit-user-select: text;
       user-select: text;
@@ -243,6 +242,198 @@ FILE: index.html
       margin-bottom: 4px;
       line-height: 1.25;
     }
+
+    .item-actions {
+      display: flex;
+      gap: 3px;
+      flex-wrap: nowrap;
+    }
+
+    .item-btn {
+      flex: 1;
+      font-size: 0.64rem;
+      padding: 2px 3px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: #020617;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .item-btn.active-support {
+      border-color: var(--success);
+      background: rgba(34,197,94,0.16);
+      color: #bbf7d0;
+    }
+
+    .item-btn.active-neutral {
+      border-color: var(--accent-soft);
+      background: rgba(107,114,128,0.22);
+      color: #e5e7eb;
+    }
+
+    .item-btn.active-against {
+      border-color: var(--danger);
+      background: rgba(249,115,115,0.18);
+      color: #fee2e2;
+    }
+
+    .item-hardfail-flag {
+      font-size: 0.6rem;
+      color: var(--danger);
+      font-weight: 700;
+      margin-left: 4px;
+    }
+
+    .final-card {
+      margin-top: 10px;
+      padding: 8px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top left, #020617, #020617);
+      border: 1px solid #4b5563;
+    }
+
+    .final-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .final-score-line {
+      font-size: 0.75rem;
+      margin-bottom: 3px;
+    }
+
+    .final-verdict {
+      font-size: 0.85rem;
+      font-weight: 800;
+      margin-bottom: 3px;
+    }
+
+    .final-note {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .export-box {
+      margin-top: 7px;
+      background: #020617;
+      border-radius: 9px;
+      border: 1px solid #111827;
+      padding: 5px;
+    }
+
+    .export-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .export-box textarea {
+      width: 100%;
+      min-height: 100px;
+      border-radius: 7px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: var(--muted);
+      font-size: 0.68rem;
+      padding: 6px;
+      resize: vertical;
+      overflow-y: auto;
+      max-height: 220px;
+    }
+
+    /* Trade log */
+    .trade-log-inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 4px;
+      margin-top: 4px;
+    }
+
+    .trade-log-inputs input,
+    .trade-log-inputs select {
+      flex: 1;
+      min-width: 0;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      background: #020617;
+      color: var(--muted);
+      font-size: 0.7rem;
+    }
+
+    .trade-log-list {
+      margin-top: 4px;
+      max-height: 180px;
+      overflow-y: auto;
+      border-radius: 6px;
+      border: 1px solid #111827;
+      padding: 4px;
+      background: #020617;
+      font-size: 0.68rem;
+    }
+
+    .trade-log-entry {
+      padding: 3px 2px;
+      border-bottom: 1px solid #111827;
+      line-height: 1.25;
+    }
+
+    .trade-log-entry:last-child { border-bottom: none; }
+
+    .trade-log-entry-header {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .trade-log-entry-meta { color: var(--muted); }
+
+    /* Update toast */
+    .update-toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      max-width: 92%;
+      background: rgba(15, 23, 42, 0.98);
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      padding: 6px 10px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+      z-index: 9999;
+    }
+
+    .update-toast-text {
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 55vw;
+    }
+
+    .update-toast-actions {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) {
+      .top-bar { flex-direction: column; align-items: flex-start; }
+      .mode-switch { margin-left: 0; }
+      .update-toast-text { max-width: 50vw; }
+    }
   </style>
 </head>
 
@@ -253,7 +444,7 @@ FILE: index.html
   <div class="subtitle">
     START siqnalından sonra 10–20 saniyəyə bütün PRO xəritəni yoxlamaq üçün offline checklist.
     V2.1: Hard-Fail sistemi, kompakt UI, collapse bölmələr, Telegram export, LONG/SHORT REAL MODE,
-    LocalStorage Trade Log, JSON Export/Import, Session Comparison V2.1.
+    LocalStorage Trade Log, JSON Export/Import, Session Comparison V2.1, Snapshot (JSON).
   </div>
 
   <div class="pill-row">
@@ -733,10 +924,186 @@ FILE: index.html
   "use strict";
 
   // ===========================
-  // SNAPSHOT STATE (OFFLINE)
+  // CONSTANTS (LocalStorage)
   // ===========================
+  const STORAGE_KEY_STATE = "proTrendV2_state";
+  const STORAGE_KEY_LOG   = "proTrendV2_trades";
+
+  const SECTION_MAX = { 1: 8, 2: 4, 3: 6, 4: 2, 5: 1 };
+  const SECTION_NAME = {
+    1: "Futures Impulse",
+    2: "Spot Confirmation",
+    3: "Extra PRO",
+    4: "Market Structure",
+    5: "BTC Regime"
+  };
+
+  // ===========================
+  // DOM
+  // ===========================
+  const $ = (id) => document.getElementById(id);
+
+  const sectionsRoot      = $("sectionsRoot");
+  const overallScoreEl    = $("overallScore");
+  const finalScoreTextEl  = $("finalScoreText");
+  const finalVerdictEl    = $("finalVerdict");
+  const finalCommentEl    = $("finalComment");
+  const hfStatusEl        = $("hfStatus");
+  const exportTextEl      = $("exportText");
+
+  const btnResetAll       = $("btnResetAll");
+  const btnCopyExport     = $("btnCopyExport");
+  const btnSaveTrade      = $("btnSaveTrade");
+  const btnExportJson     = $("btnExportJson");
+  const btnImportJson     = $("btnImportJson");
+  const btnCompareSessions= $("btnCompareSessions");
+
+  const modeLongBtn       = $("modeLong");
+  const modeShortBtn      = $("modeShort");
+
+  // Snapshot
+  const snapshotInput     = $("snapshotInput");
+  const btnAttachSnapshot = $("btnAttachSnapshot");
+  const snapshotStatus    = $("snapshotStatus");
   let pendingSnapshot = null;
 
+  // Update toast
+  const updateToast       = $("updateToast");
+  const updateRefreshBtn  = $("updateRefreshBtn");
+  const updateDismissBtn  = $("updateDismissBtn");
+  let waitingSW = null;
+
+  // ===========================
+  // State
+  // ===========================
+  let currentMode = "LONG";
+  const itemTexts = {}; // long base texts
+  let tradeLog = [];
+
+  let lastTotals = {
+    total: 0,
+    secScores: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+    hardFail: false,
+    verdict: "Status: No data"
+  };
+
+  // SHORT mode texts (only overrides)
+  const shortModeConfig = {
+    1: { title: "1) Taker Buy/Sell Flow (Δ Taker) — SHORT",
+      desc: "Bearish (SHORT): Sell üstün, qırmızı spike, sell > 55–60%.<br>Kritik: Price ↓ amma sell zəif → fake dump / short trap riski." },
+    2: { title: "2) Basis (Futures vs Spot Premium) — SHORT",
+      desc: "Bearish (SHORT): Basis yüngül ↓ və ya mənfi, futures spotdan aşağı.<br>Kritik: Basis kəskin ↑ + Price ↓ → crowded shorts, squeeze riski." },
+    3: { title: "3) OI / Market Cap Ratio — SHORT",
+      desc: "Bearish (SHORT): Ratio ↑ və Price ↓ → leveraged short trend güclüdür.<br>Kritik: Ratio ↓ + Price ↓ → trend yorğun, late short riski." },
+    4: { title: "4) OI Dynamics — 4 Davranış (SHORT)",
+      desc: "SHORT konteksində:<br>↑OI + ↓Price → continuation (SHORT üçün yaxşı)<br>↑OI + ↑Price → short squeeze / trap riski<br>↓OI + ↓Price → son faza, daha çox profit-taking<br>↓OI + ↑Price → squeeze, yeni short üçün çox risklidir." },
+    5: { title: "5) Notional OI — SHORT",
+      desc: "Bearish (SHORT): Notional stabil / yüngül ↑, Price ↓ → short tərəfi aktivdir.<br>Kritik: Notional ↓ + Price ↓ → de-leverage son faza, late short." },
+    6: { title: "6) Top Trader Account Ratio — SHORT",
+      desc: "SHORT: Retail long-heavydirsə, pros short tərəfdə → üstünlük.<br>Kritik: Retail hamısı short → squeeze riski." },
+    7: { title: "7) Top Trader Position Ratio — SHORT",
+      desc: "SHORT: Pros short bias-dadırsa, setup daha etibarlıdır.<br>Əksinədirsə, short üçün ehtiyat." },
+    8: { title: "8) Global Long/Short Ratio — SHORT",
+      desc: "SHORT: Global > 1 (crowded longs) → short üçün rüzgar sənin tərəfindədir.<br>Global < 1 və hamı shortdadırsa → squeeze riski." },
+    9: { title: "BLOCK 1 — Spot Money Flow (SHORT)",
+      desc: "SHORT: Net outflow, sell walls, yuxarıda sell interest → dump davam edə bilər.<br>Against (SHORT üçün): Net inflow + buy walls → short üçün təhlükə." },
+    10:{ title: "BLOCK 2 — Spot Volume (SHORT)",
+      desc: "SHORT: Aşağıya doğru impulsda sell volume ↑ davamlı.<br>Kritik: Volume sönürsə, dump gücünü itirir, late short riski." },
+    11:{ title: "BLOCK 3 — Spot Orderbook (SHORT)",
+      desc: "SHORT: Yuxarıda ASK walls, sell absorption, hər pump satılır.<br>Against: Aşağıda güclü BID walls → short üçün risk." },
+    12:{ title: "BLOCK 4 — Spot Price Action (SHORT)",
+      desc: "SHORT: LH/LF, lower highs/lows → bearish structure, continuation üçün yaxşı.<br>Against: HH/HL → short-a qarşı trend." },
+    14:{ title: "2) Liquidation Heatmap (SHORT)",
+      desc: "SHORT: Aşağıda likvidation cluster-lar target kimidir, amma çox yaxınsa immediate bounce riski var.<br>Yuxarıdakı böyük cluster-lar squeeze üçün maqnit ola bilər." },
+    15:{ title: "3) VWAP (SHORT)",
+      desc: "SHORT: Price < VWAP və VWAP aşağı meyillidirsə → trend short tərəfdədir.<br>Against: Price > VWAP və hər dəfə üstündə qalırsa → short üçün zəifdir." },
+    17:{ title: "5) Funding Curve (SHORT)",
+      desc: "SHORT: Funding çox pozitiv + crowded longs → short üçün advantage.<br>Against: Funding artıq negativ, amma Price hələ də aşağıdırsa → late short riski." },
+    18:{ title: "6) Implied Volatility (IV) — SHORT",
+      desc: "SHORT: IV çox yüksək + Price aşağı → qısa müddətlik continuation, amma agressiv squeeze riski də artır.<br>IV düşməyə başlayırsa → artıq de-risking gedir, late short ola bilər." },
+    19:{ title: "1) 4H Macro Trend — SHORT",
+      desc: "SHORT: Price EMA 50/200 altında → makro bearish kontekst, short üçün uyğundur.<br>Against: EMA-ların üstündə → short üçün əks trend." },
+    20:{ title: "2) Local Structure — SHORT",
+      desc: "SHORT: BOS down, lower lows/highs → continuation üçün yaxşı.<br>BOS up → short-a qarşı local reversal." },
+    21:{ title: "BTC Mood (OI, VWAP, Liquidity) — SHORT",
+      desc: "SHORT: BTC OI ↑ + Price ↓, VWAP altında → altcoin SHORT üçün sağlam fon.<br>Against: OI ↑ + Price ↑ → BTC-də squeeze rejimi, NO-TRADE." }
+  };
+
+  // ===========================
+  // Helpers
+  // ===========================
+  function sectionMax(id) { return SECTION_MAX[id] || 0; }
+
+  function formatTimestamp(ts) {
+    try {
+      const d = new Date(ts);
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      return `${y}-${m}-${day} ${hh}:${mm}`;
+    } catch {
+      return String(ts || "");
+    }
+  }
+
+  function buildVerdict(total, hardFail) {
+    if (hardFail) {
+      return {
+        verdict: "❌ HARD-FAIL — NO TRADE",
+        comment: "BTC və ya OI Dynamics ciddi əleyhdədir. Score yüksək olsa belə TREYD ETMƏ. Trap riskini qəbul etmə."
+      };
+    }
+    if (total >= 13) {
+      return {
+        verdict: "✅ HIGH CONVICTION — PRO Entry",
+        comment: "Futures + Spot + Extra PRO + Struktur + BTC hamısı sənin tərəfindədir. Planlı risklə PRO ölçüdə entry mümkündür."
+      };
+    }
+    if (total >= 7) {
+      return {
+        verdict: "🟢 STRONG / OK Setup",
+        comment: "Əsas bloklar alignment verir. Normal ölçüdə trade edilə bilər, zəif blokları risk hesablamasında nəzərə al."
+      };
+    }
+    if (total >= 3) {
+      return {
+        verdict: "🟡 MIXED — Small Size / Scout",
+        comment: "Bəzi bloklar yaxşı, bəziləri əleyhinədir. Bu daha çox scout-size və praktik müşahidə treydi üçündür."
+      };
+    }
+    if (total >= 0) {
+      return {
+        verdict: "🟧 WEAK — NO-TRADE Zone",
+        comment: "Alignment çox zəifdir. Daha təmiz impuls və daha güclü təsdiq üçün səbr etmək uzun müddətdə daha sərfəlidir."
+      };
+    }
+    return {
+      verdict: "🔴 CONTRARIAN ONLY",
+      comment: "Ümumi skor mənfidir. Bu yalnız çox təcrübəli kontrarian scalp üçün məntiqlidir, normal treyd üçün uyğun deyil."
+    };
+  }
+
+  function buildExport(secScores, total, verdict, hardFail) {
+    let text = "";
+    text += "📌 PRO Trend Verification — FULL MODE V2.1\n";
+    text += `Mode: ${currentMode}\n`;
+    text += "----------------------------------------\n";
+    text += `🟦 Futures Impulse: ${secScores[1]} / 8\n`;
+    text += `🟩 Spot Confirmation: ${secScores[2]} / 4\n`;
+    text += `🟪 Extra PRO: ${secScores[3]} / 6\n`;
+    text += `🟥 Market Structure: ${secScores[4]} / 2\n`;
+    text += `🟧 BTC Regime: ${secScores[5]} / 1\n\n`;
+    text += `📊 Overall Score: ${total} / 21\n`;
+    text += `⚙️ Hard-Fail: ${hardFail ? "VAR (NO-TRADE)" : "Yox"}\n`;
+    text += `🧾 Verdict: ${verdict}\n`;
+    exportTextEl.value = text;
+  }
+
+  // ===========================
+  // Snapshot
+  // ===========================
   function safeParseSnapshot(text) {
     try {
       const obj = JSON.parse(text);
@@ -748,16 +1115,11 @@ FILE: index.html
   }
 
   function attachSnapshot() {
-    const raw = $("snapshotInput").value.trim();
-    if (!raw) {
-      alert("Snapshot JSON boşdur.");
-      return;
-    }
+    const raw = (snapshotInput?.value || "").trim();
+    if (!raw) { alert("Snapshot JSON boşdur."); return; }
+
     const parsed = safeParseSnapshot(raw);
-    if (!parsed) {
-      alert("Snapshot JSON formatı düzgün deyil.");
-      return;
-    }
+    if (!parsed) { alert("Snapshot JSON formatı düzgün deyil."); return; }
 
     pendingSnapshot = {
       attachedAt: new Date().toISOString(),
@@ -765,27 +1127,252 @@ FILE: index.html
       raw
     };
 
-    $("snapshotStatus").textContent = "Snapshot növbəti trade üçün hazırdır ✔";
-    $("snapshotStatus").style.color = "var(--accent)";
+    if (snapshotStatus) {
+      snapshotStatus.textContent = "Snapshot növbəti trade üçün hazırdır ✔";
+      snapshotStatus.style.color = "var(--accent)";
+    }
   }
 
   // ===========================
-  // OVERRIDE YOX — SAVE LOG (NATIVE)
+  // Mode text system
   // ===========================
+  function initModeTexts() {
+    document.querySelectorAll(".item").forEach((item) => {
+      const id = item.dataset.id;
+      if (!id) return;
+      const tEl = item.querySelector(".item-title");
+      const dEl = item.querySelector(".item-desc");
+      if (!tEl || !dEl) return;
+      if (!itemTexts[id]) {
+        itemTexts[id] = { titleLong: tEl.innerHTML, descLong: dEl.innerHTML };
+      }
+    });
+  }
+
+  function applyModeToItems() {
+    document.querySelectorAll(".item").forEach((item) => {
+      const id = item.dataset.id;
+      if (!id) return;
+      const tEl = item.querySelector(".item-title");
+      const dEl = item.querySelector(".item-desc");
+      if (!tEl || !dEl) return;
+
+      const base = itemTexts[id];
+      if (currentMode === "LONG") {
+        if (base) { tEl.innerHTML = base.titleLong; dEl.innerHTML = base.descLong; }
+      } else {
+        const cfg = shortModeConfig[id] || {};
+        tEl.innerHTML = cfg.title || (base && base.titleLong) || tEl.innerHTML;
+        dEl.innerHTML = cfg.desc || (base && base.descLong) || dEl.innerHTML;
+      }
+    });
+  }
+
+  function setMode(mode) {
+    currentMode = (mode === "SHORT") ? "SHORT" : "LONG";
+    modeLongBtn.classList.toggle("active-mode", currentMode === "LONG");
+    modeShortBtn.classList.toggle("active-mode", currentMode === "SHORT");
+    applyModeToItems();
+    recompute();
+    saveStateToStorage();
+  }
+
+  // ===========================
+  // Scoring logic (delegated)
+  // ===========================
+  function setScoreForItem(itemEl, score) {
+    if (!itemEl) return;
+    itemEl.dataset.score = String(score);
+
+    const buttons = itemEl.querySelectorAll(".item-btn");
+    buttons.forEach((b) => b.classList.remove("active-support", "active-neutral", "active-against"));
+
+    const pressed = itemEl.querySelector(`.item-btn[data-score="${score}"]`);
+    if (score === 1 && pressed) pressed.classList.add("active-support");
+    else if (score === 0 && pressed) pressed.classList.add("active-neutral");
+    else if (score === -1 && pressed) pressed.classList.add("active-against");
+
+    recompute();
+    saveStateToStorage();
+  }
+
+  function recompute() {
+    const secScores = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    let hardFail = false;
+
+    document.querySelectorAll(".section[data-section]").forEach((sec) => {
+      const sid = parseInt(sec.dataset.section || "0", 10);
+      if (!sid) return;
+
+      let sum = 0;
+      sec.querySelectorAll(".item").forEach((item) => {
+        const s = parseInt(item.dataset.score || "0", 10);
+        sum += s;
+        if (item.dataset.hardfail === "true" && s === -1) hardFail = true;
+      });
+
+      const max = sectionMax(sid);
+      const clamped = Math.max(0, Math.min(max, sum));
+      secScores[sid] = clamped;
+    });
+
+    const total = secScores[1] + secScores[2] + secScores[3] + secScores[4] + secScores[5];
+
+    for (let i = 1; i <= 5; i++) {
+      const el = $("score-sec-" + i);
+      if (el) el.textContent = `${secScores[i]} / ${SECTION_MAX[i]}`;
+    }
+
+    const v = buildVerdict(total, hardFail);
+
+    lastTotals = {
+      total,
+      secScores: { ...secScores },
+      hardFail,
+      verdict: v.verdict
+    };
+
+    overallScoreEl.textContent = String(total);
+    finalScoreTextEl.textContent = `${total} / 21`;
+    finalVerdictEl.textContent = v.verdict;
+    finalCommentEl.textContent = v.comment;
+
+    hfStatusEl.textContent = `Hard-Fail: ${hardFail ? "VAR (NO-TRADE)" : "Yox"}`;
+    hfStatusEl.classList.toggle("hf-ok", !hardFail);
+    hfStatusEl.classList.toggle("hf-bad", hardFail);
+
+    buildExport(secScores, total, v.verdict, hardFail);
+  }
+
+  // ===========================
+  // LocalStorage state
+  // ===========================
+  function saveStateToStorage() {
+    try {
+      const scores = {};
+      document.querySelectorAll(".item").forEach((item) => {
+        const id = item.dataset.id;
+        if (!id) return;
+        scores[id] = parseInt(item.dataset.score || "0", 10);
+      });
+      const payload = { version: 1, mode: currentMode, scores };
+      localStorage.setItem(STORAGE_KEY_STATE, JSON.stringify(payload));
+    } catch {}
+  }
+
+  function loadStateFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_STATE);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  function applySavedScores(scores) {
+    if (!scores) return;
+    document.querySelectorAll(".item").forEach((item) => {
+      const id = item.dataset.id;
+      if (!id) return;
+      if (!(id in scores)) return;
+
+      const s = parseInt(scores[id], 10);
+      item.dataset.score = String(s);
+
+      const buttons = item.querySelectorAll(".item-btn");
+      buttons.forEach((b) => b.classList.remove("active-support", "active-neutral", "active-against"));
+
+      const pressed = item.querySelector(`.item-btn[data-score="${s}"]`);
+      if (s === 1 && pressed) pressed.classList.add("active-support");
+      else if (s === 0 && pressed) pressed.classList.add("active-neutral");
+      else if (s === -1 && pressed) pressed.classList.add("active-against");
+    });
+  }
+
+  // ===========================
+  // Reset & Copy
+  // ===========================
+  function resetAll() {
+    document.querySelectorAll(".item").forEach((item) => {
+      delete item.dataset.score;
+      const buttons = item.querySelectorAll(".item-btn");
+      buttons.forEach((b) => b.classList.remove("active-support", "active-neutral", "active-against"));
+    });
+    recompute();
+    saveStateToStorage();
+  }
+
+  async function copyExport() {
+    try {
+      const txt = exportTextEl.value || "";
+      if (!txt.trim()) { alert("Export boşdur."); return; }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(txt);
+      } else {
+        exportTextEl.focus();
+        exportTextEl.select();
+        document.execCommand("copy");
+      }
+      alert("Export kopyalandı ✔");
+    } catch {
+      alert("Copy alınmadı. (iOS/PWA icazə məhdudiyyəti ola bilər)");
+    }
+  }
+
+  // ===========================
+  // Trade log
+  // ===========================
+  function saveTradeLogToStorage() {
+    try { localStorage.setItem(STORAGE_KEY_LOG, JSON.stringify(tradeLog)); } catch {}
+  }
+
+  function loadTradeLog() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY_LOG);
+      tradeLog = raw ? (JSON.parse(raw) || []) : [];
+    } catch {
+      tradeLog = [];
+    }
+    renderTradeLog();
+    updateSessionSelectors();
+  }
+
+  function renderTradeLog() {
+    const box = $("tradeLogList");
+    if (!box) return;
+
+    if (!tradeLog.length) {
+      box.innerHTML = '<div style="color: var(--muted); font-size:0.68rem;">Hələ heç bir trade yoxdur.</div>';
+      return;
+    }
+
+    let html = "";
+    tradeLog.slice().reverse().forEach((entry) => {
+      const hasSnap = !!entry.snapshot;
+      html += `<div class="trade-log-entry">
+        <div class="trade-log-entry-header">[${formatTimestamp(entry.ts)}] ${entry.symbol || "N/A"} ${entry.tf ? "(" + entry.tf + ")" : ""}</div>
+        <div class="trade-log-entry-meta">Mode: ${entry.mode} — Score: ${entry.totalScore ?? 0}/21 — HardFail: ${entry.hardFail ? "VAR" : "Yox"}</div>
+        <div class="trade-log-entry-meta">Verdict: ${entry.verdict || "-"}</div>
+        ${hasSnap ? `<details style="margin-top:4px;">
+          <summary style="cursor:pointer;color:var(--accent);font-size:0.65rem;">📦 Snapshot (click)</summary>
+          <pre style="white-space:pre-wrap;font-size:0.62rem;color:var(--muted);margin-top:4px;">${JSON.stringify(entry.snapshot.data, null, 2)}</pre>
+        </details>` : ""}
+      </div>`;
+    });
+
+    box.innerHTML = html;
+  }
+
   function saveTradeLog() {
     const symbol = ($("logSymbol").value || "").trim();
     const tf = ($("logTF").value || "").trim();
 
-    if (!symbol) {
-      alert("Trade log üçün ən azı pair (məs: BTCUSDT) yaz.");
-      return;
-    }
+    if (!symbol) { alert("Trade log üçün ən azı pair (məs: BTCUSDT) yaz."); return; }
 
     const anyScored = !!document.querySelector(".item[data-score]");
-    if (!anyScored) {
-      alert("Əvvəlcə checklist-dən ən azı bir neçə punkt işarələ.");
-      return;
-    }
+    if (!anyScored) { alert("Əvvəlcə checklist-dən ən azı bir neçə punkt işarələ, sonra log et."); return; }
 
     const entry = {
       ts: new Date().toISOString(),
@@ -800,13 +1387,12 @@ FILE: index.html
     };
 
     tradeLog.push(entry);
-    if (tradeLog.length > 200) {
-      tradeLog = tradeLog.slice(tradeLog.length - 200);
-    }
+    if (tradeLog.length > 200) tradeLog = tradeLog.slice(tradeLog.length - 200);
 
+    // reset snapshot after save
     pendingSnapshot = null;
-    $("snapshotInput").value = "";
-    $("snapshotStatus").textContent = "";
+    if (snapshotInput) snapshotInput.value = "";
+    if (snapshotStatus) snapshotStatus.textContent = "";
 
     saveTradeLogToStorage();
     renderTradeLog();
@@ -816,49 +1402,7 @@ FILE: index.html
   }
 
   // ===========================
-  // RENDER LOG (Snapshot aware)
-  // ===========================
-  function renderTradeLog() {
-    const box = $("tradeLogList");
-    if (!box) return;
-
-    if (!tradeLog.length) {
-      box.innerHTML = '<div style="color: var(--muted); font-size:0.68rem;">Hələ heç bir trade yoxdur.</div>';
-      return;
-    }
-
-    let html = "";
-    tradeLog.slice().reverse().forEach((entry, idx) => {
-      const hasSnap = !!entry.snapshot;
-      html += `<div class="trade-log-entry">
-        <div class="trade-log-entry-header">
-          [${formatTimestamp(entry.ts)}] ${entry.symbol} ${entry.tf ? "(" + entry.tf + ")" : ""}
-        </div>
-        <div class="trade-log-entry-meta">
-          Mode: ${entry.mode} — Score: ${entry.totalScore}/21 — HardFail: ${entry.hardFail ? "VAR" : "Yox"}
-        </div>
-        <div class="trade-log-entry-meta">
-          Verdict: ${entry.verdict}
-        </div>
-        ${hasSnap ? `<details style="margin-top:4px;">
-          <summary style="cursor:pointer;color:var(--accent);font-size:0.65rem;">📦 Snapshot (click)</summary>
-          <pre style="white-space:pre-wrap;font-size:0.62rem;color:var(--muted);margin-top:4px;">
-${JSON.stringify(entry.snapshot.data, null, 2)}
-          </pre>
-        </details>` : ""}
-      </div>`;
-    });
-
-    box.innerHTML = html;
-  }
-
-  // ===========================
-  // SNAPSHOT BUTTON WIRE
-  // ===========================
-  $("btnAttachSnapshot").addEventListener("click", attachSnapshot);
-
-  // ===========================
-  // JSON EXPORT (Snapshot-aware)
+  // JSON export/import (Snapshot-aware)
   // ===========================
   function exportJournalJson() {
     try {
@@ -895,17 +1439,14 @@ ${JSON.stringify(entry.snapshot.data, null, 2)}
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
 
+      URL.revokeObjectURL(url);
       alert("Snapshot-lı Journal JSON export olundu ✔");
-    } catch (e) {
+    } catch {
       alert("Export zamanı xəta baş verdi.");
     }
   }
 
-  // ===========================
-  // JSON IMPORT (Snapshot-aware)
-  // ===========================
   function importJournalJson() {
     const fileInput = $("importFile");
     if (!fileInput) return;
@@ -921,13 +1462,8 @@ ${JSON.stringify(entry.snapshot.data, null, 2)}
           const data = JSON.parse(ev.target.result);
           if (!data || typeof data !== "object") throw new Error("Bad JSON");
 
-          if (data.mode === "SHORT" || data.mode === "LONG") {
-            setMode(data.mode);
-          }
-
-          if (data.scores && typeof data.scores === "object") {
-            applySavedScores(data.scores);
-          }
+          if (data.mode === "SHORT" || data.mode === "LONG") setMode(data.mode);
+          if (data.scores && typeof data.scores === "object") applySavedScores(data.scores);
 
           if (Array.isArray(data.tradeLog)) {
             tradeLog = data.tradeLog;
@@ -952,8 +1488,53 @@ ${JSON.stringify(entry.snapshot.data, null, 2)}
   }
 
   // ===========================
-  // SESSION COMPARISON (Snapshot-safe)
+  // Session comparison (V2.1)
   // ===========================
+  function updateSessionSelectors() {
+    const selA = $("sessionA");
+    const selB = $("sessionB");
+    const resBox = $("sessionCompareResult");
+    if (!selA || !selB || !resBox) return;
+
+    selA.innerHTML = "";
+    selB.innerHTML = "";
+
+    if (!tradeLog.length) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "No sessions logged";
+      selA.appendChild(opt.cloneNode(true));
+      selB.appendChild(opt);
+      selA.disabled = true;
+      selB.disabled = true;
+      resBox.innerHTML = '<div style="color: var(--muted); font-size:0.68rem;">Müqayisə üçün əvvəlcə ən azı 2 trade log et.</div>';
+      return;
+    }
+
+    selA.disabled = false;
+    selB.disabled = false;
+
+    tradeLog.forEach((entry, idx) => {
+      const label = `[${formatTimestamp(entry.ts)}] ${entry.symbol || "N/A"} ${entry.tf ? "(" + entry.tf + ")" : ""} — ${entry.mode} ${entry.totalScore != null ? " | " + entry.totalScore + "/21" : ""}`;
+
+      const optA = document.createElement("option");
+      optA.value = String(idx);
+      optA.textContent = label;
+
+      const optB = document.createElement("option");
+      optB.value = String(idx);
+      optB.textContent = label;
+
+      selA.appendChild(optA);
+      selB.appendChild(optB);
+    });
+
+    const n = tradeLog.length;
+    if (n >= 1) selB.value = String(n - 1);
+    if (n >= 2) selA.value = String(n - 2);
+    else selA.value = String(0);
+  }
+
   function compareSessions() {
     const selA = $("sessionA");
     const selB = $("sessionB");
@@ -967,14 +1548,9 @@ ${JSON.stringify(entry.snapshot.data, null, 2)}
       isNaN(idxA) || isNaN(idxB) ||
       idxA < 0 || idxB < 0 ||
       idxA >= tradeLog.length || idxB >= tradeLog.length
-    ) {
-      alert("Müqayisə üçün 2 keçərli sessiya seç.");
-      return;
-    }
-    if (idxA === idxB) {
-      alert("Eyni sessiyanı müqayisə etmək olmaz.");
-      return;
-    }
+    ) { alert("Müqayisə üçün 2 keçərli sessiya seç."); return; }
+
+    if (idxA === idxB) { alert("Eyni sessiyanı müqayisə etmək olmaz."); return; }
 
     const A = tradeLog[idxA];
     const B = tradeLog[idxB];
@@ -986,14 +1562,14 @@ ${JSON.stringify(entry.snapshot.data, null, 2)}
 
     html += `<div class="trade-log-entry">
       <div class="trade-log-entry-header">Session A</div>
-      <div class="trade-log-entry-meta">[${formatTimestamp(A.ts)}] ${A.symbol} ${A.tf ? "(" + A.tf + ")" : ""}</div>
-      <div class="trade-log-entry-meta">Score: ${A.totalScore}/21 — HardFail: ${A.hardFail ? "VAR" : "Yox"}</div>
+      <div class="trade-log-entry-meta">[${formatTimestamp(A.ts)}] ${A.symbol || "N/A"} ${A.tf ? "(" + A.tf + ")" : ""}</div>
+      <div class="trade-log-entry-meta">Score: ${A.totalScore ?? 0}/21 — HardFail: ${A.hardFail ? "VAR" : "Yox"}</div>
     </div>`;
 
     html += `<div class="trade-log-entry">
       <div class="trade-log-entry-header">Session B</div>
-      <div class="trade-log-entry-meta">[${formatTimestamp(B.ts)}] ${B.symbol} ${B.tf ? "(" + B.tf + ")" : ""}</div>
-      <div class="trade-log-entry-meta">Score: ${B.totalScore}/21 — HardFail: ${B.hardFail ? "VAR" : "Yox"}</div>
+      <div class="trade-log-entry-meta">[${formatTimestamp(B.ts)}] ${B.symbol || "N/A"} ${B.tf ? "(" + B.tf + ")" : ""}</div>
+      <div class="trade-log-entry-meta">Score: ${B.totalScore ?? 0}/21 — HardFail: ${B.hardFail ? "VAR" : "Yox"}</div>
     </div>`;
 
     html += `<div class="trade-log-entry">
@@ -1010,19 +1586,51 @@ ${JSON.stringify(entry.snapshot.data, null, 2)}
       </div>`;
     }
 
+    html += `</div>`;
     resBox.innerHTML = html;
   }
 
   // ===========================
-  // BUTTON WIRES (Snapshot included)
+  // Section collapse (safe)
   // ===========================
-  btnSaveTrade.addEventListener("click", saveTradeLog);
-  btnExportJson.addEventListener("click", exportJournalJson);
-  btnImportJson.addEventListener("click", importJournalJson);
-  btnCompareSessions.addEventListener("click", compareSessions);
+  function initCollapse() {
+    document.querySelectorAll(".section-header").forEach((h) => {
+      h.addEventListener("click", (e) => {
+        if (e.target.closest("button")) return;
+        const sec = h.closest(".section");
+        if (!sec) return;
+        sec.classList.toggle("collapsed");
+      });
+    });
+
+    // Default: only Section 1 open
+    document.querySelectorAll(".section[data-section]").forEach((sec) => {
+      const id = parseInt(sec.dataset.section || "0", 10);
+      if (id > 1) sec.classList.add("collapsed");
+    });
+  }
 
   // ===========================
-  // SERVICE WORKER UPDATE TOAST
+  // Delegated tap/click handler (iOS stable)
+  // ===========================
+  function initDelegatedButtons() {
+    if (!sectionsRoot) return;
+
+    const handler = (e) => {
+      const btn = e.target.closest(".item-btn");
+      if (!btn) return;
+      const item = btn.closest(".item");
+      if (!item) return;
+      const score = parseInt(btn.dataset.score || "0", 10);
+      setScoreForItem(item, score);
+    };
+
+    sectionsRoot.addEventListener("pointerup", handler);
+    sectionsRoot.addEventListener("click", handler);
+  }
+
+  // ===========================
+  // Service worker update toast
   // ===========================
   function showUpdateToast() {
     if (!updateToast) return;
@@ -1060,52 +1668,57 @@ ${JSON.stringify(entry.snapshot.data, null, 2)}
       navigator.serviceWorker.addEventListener("controllerchange", () => {
         window.location.reload();
       });
-    } catch (e) {
-      // səssiz fail — offline işləməyə təsir etmir
+    } catch {
+      // səssiz fail
     }
   }
 
   // ===========================
-  // WIRE TOP BUTTONS
+  // Wire buttons
   // ===========================
   function wireTopButtons() {
-    btnResetAll.addEventListener("click", resetAll);
-    btnCopyExport.addEventListener("click", copyExport);
+    btnResetAll?.addEventListener("click", resetAll);
+    btnCopyExport?.addEventListener("click", copyExport);
 
-    modeLongBtn.addEventListener("click", () => setMode("LONG"));
-    modeShortBtn.addEventListener("click", () => setMode("SHORT"));
+    modeLongBtn?.addEventListener("click", () => setMode("LONG"));
+    modeShortBtn?.addEventListener("click", () => setMode("SHORT"));
 
-    updateRefreshBtn.addEventListener("click", () => {
-      try {
-        if (waitingSW) waitingSW.postMessage({ type: "SKIP_WAITING" });
-      } catch {}
+    btnSaveTrade?.addEventListener("click", saveTradeLog);
+    btnExportJson?.addEventListener("click", exportJournalJson);
+    btnImportJson?.addEventListener("click", importJournalJson);
+    btnCompareSessions?.addEventListener("click", compareSessions);
+
+    btnAttachSnapshot?.addEventListener("click", attachSnapshot);
+
+    updateRefreshBtn?.addEventListener("click", () => {
+      try { if (waitingSW) waitingSW.postMessage({ type: "SKIP_WAITING" }); } catch {}
       hideUpdateToast();
     });
 
-    updateDismissBtn.addEventListener("click", hideUpdateToast);
+    updateDismissBtn?.addEventListener("click", hideUpdateToast);
   }
 
   // ===========================
-  // BOOT SEQUENCE (FINAL)
+  // Boot
   // ===========================
   function boot() {
+    // Guard: əsas elementlər yoxdursa, JS-in qalanı işləməsin
+    if (!sectionsRoot || !overallScoreEl || !finalVerdictEl || !exportTextEl) {
+      console.error("DOM elements missing. Check index.html integrity.");
+      return;
+    }
+
     initCollapse();
     initModeTexts();
     initDelegatedButtons();
     wireTopButtons();
 
-    // Load saved state
     const state = loadStateFromStorage();
-    if (state && (state.mode === "LONG" || state.mode === "SHORT")) {
-      currentMode = state.mode;
-    }
+    if (state && (state.mode === "LONG" || state.mode === "SHORT")) currentMode = state.mode;
+
     applyModeToItems();
+    if (state && state.scores) applySavedScores(state.scores);
 
-    if (state && state.scores) {
-      applySavedScores(state.scores);
-    }
-
-    // Load trade log
     loadTradeLog();
 
     modeLongBtn.classList.toggle("active-mode", currentMode === "LONG");
@@ -1120,7 +1733,6 @@ ${JSON.stringify(entry.snapshot.data, null, 2)}
   } else {
     boot();
   }
-
 })();
 </script>
 </body>
